@@ -8,6 +8,9 @@ import { RefreshTokenModule } from "./api/refresh-token/refresh-token.module";
 import { RoleModule } from "./api/roles/role.module";
 import { PermissionModule } from "./api/permission/permission.module";
 import { ConfigModule } from "@nestjs/config";
+import { HotelsModule } from "./api/hotels/hotels.module";
+import { RoomsModule } from "./api/rooms/rooms.module";
+import { FirebaseModule } from "./api/firebase/firebase.module";
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { ConfigModule } from "@nestjs/config";
     RefreshTokenModule,
     RoleModule,
     PermissionModule,
+    HotelsModule,
+    RoomsModule,
+    FirebaseModule,
   ],
   controllers: [],
   providers: [
