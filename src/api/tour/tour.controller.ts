@@ -36,10 +36,7 @@ export class TourController {
     @UploadedFiles() files: Express.Multer.File[]
   ) {
     try {
-      const savedTour = await this.tourService.createTour(
-        createTourDto,
-        files[0]
-      );
+      const savedTour = await this.tourService.createTour(createTourDto, files);
       return successResponse(savedTour);
     } catch (error) {
       throw new CommonException(
@@ -50,12 +47,18 @@ export class TourController {
   }
 
   @Put(":id")
+  @UseInterceptors(FilesInterceptor("files"))
   async updateTour(
     @Param("id", ParseObjectIdPipe) id: string,
-    @Body() updateTourDto: UpdateTourDto
+    @Body() updateTourDto: UpdateTourDto,
+    @UploadedFiles() files: Express.Multer.File[]
   ) {
     try {
-      const updatedTour = await this.tourService.updateTour(id, updateTourDto);
+      const updatedTour = await this.tourService.updateTour(
+        id,
+        updateTourDto,
+        files
+      );
       return successResponse(updatedTour);
     } catch (error) {
       throw new CommonException(
@@ -66,10 +69,10 @@ export class TourController {
   }
 
   @Delete(":id")
-  async deleteTour(@Param("id", ParseObjectIdPipe) id: string) {
+  async cancelTour(@Param("id", ParseObjectIdPipe) id: string) {
     try {
       await this.tourService.deleteTour(id);
-      return successResponse("Successfully deleted");
+      return successResponse("Successfully cancel tour");
     } catch (error) {
       throw new CommonException(
         error.message,
@@ -111,20 +114,6 @@ export class TourController {
     try {
       const tours = await this.tourService.getTourBySearch(query);
       return successResponse(tours);
-    } catch (error) {
-      throw new CommonException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  @SkipAuth()
-  @Get("featured")
-  async getFeaturedTours() {
-    try {
-      const featuredTours = await this.tourService.getFeaturedTours();
-      return successResponse(featuredTours);
     } catch (error) {
       throw new CommonException(
         error.message,

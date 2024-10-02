@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, Min } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, Min, IsEnum } from "class-validator";
 
 export class CreateBookingRequest {
   @IsString()

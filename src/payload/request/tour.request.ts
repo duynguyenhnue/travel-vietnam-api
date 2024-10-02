@@ -5,31 +5,36 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsBoolean,
-  IsArray,
   IsMongoId,
   Min,
   Max,
   Length,
   Matches,
+  IsDate,
+  IsDateString,
+  ValidateNested,
 } from "class-validator";
-import { Types } from "mongoose";
+import { ObjectId, Types } from "mongoose";
+
+class Address {
+  @IsString()
+  @IsNotEmpty()
+  province: string;
+
+  @IsString()
+  @IsNotEmpty()
+  district: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ward: string;
+}
 
 export class CreateTourDto {
   @IsString()
   @IsNotEmpty()
   @Length(3, 100)
   title: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Length(2, 100)
-  city: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Length(5, 200)
-  address: string;
 
   @IsString()
   @IsNotEmpty()
@@ -47,17 +52,31 @@ export class CreateTourDto {
   })
   maxGroupSize: number;
 
-  @IsArray()
-  @IsOptional()
-  @IsMongoId({ each: true })
-  reviews?: Types.ObjectId[];
+  @IsMongoId()
+  @IsNotEmpty()
+  hotelId: ObjectId;
 
-  @IsBoolean()
-  @IsOptional()
-  featured?: boolean;
+  @IsNotEmpty()
+  @IsDateString()
+  startDate: Date;
+
+  @IsNotEmpty()
+  @IsDateString()
+  endDate: Date;
+
+  @ValidateNested()
+  @Type(() => Address)
+  destination: Address;
+
+  @ValidateNested()
+  @Type(() => Address)
+  departurePoint: Address;
 }
 
-export class UpdateTourDto extends PartialType(CreateTourDto) {}
+export class UpdateTourDto extends PartialType(CreateTourDto) {
+  @IsNotEmpty()
+  photos: string[];
+}
 
 export class GetTourRequestDto {
   @Type(() => Number)
@@ -72,15 +91,14 @@ export class GetTourRequestDto {
 export class SearchTourRequestDto extends GetTourRequestDto {
   @IsString()
   @IsOptional()
-  @Length(2, 100)
-  city: string;
+  title?: string;
 
   @IsOptional()
-  @Matches(/^[1-9]$/, {
+  @Matches(/^(?:[1-9]|[1-4][0-9]|50)$/, {
     message:
-      "MaxGroupSize must be a string containing a number between '1' and '9'.",
+      "MaxGroupSize must be a string containing a number between '1' and '50'.",
   })
-  groupSize: number;
+  groupSize?: number;
 }
 
 export class CreateReviewRequest {

@@ -11,12 +11,26 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Post()
+  @SkipAuth()
   async createBooking(@Body() createBookingDto: CreateBookingRequest) {
     try {
       const savedBooking = await this.bookingService.createBooking(
         createBookingDto
       );
       return successResponse(savedBooking);
+    } catch (error) {
+      throw new CommonException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post()
+  async cancelBooking(@Param("id", ParseObjectIdPipe) id: string) {
+    try {
+      await this.bookingService.cancelBooking(id);
+      return successResponse("Booking has been cancelled");
     } catch (error) {
       throw new CommonException(
         error.message,

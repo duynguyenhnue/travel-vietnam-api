@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UploadedFiles } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import {
@@ -10,49 +10,73 @@ import {
 import { Tour, TourDocument } from "src/schema/tour.schema";
 import { FirebaseService } from "../firebase/firebase.service";
 import { Folder } from "src/enums/folder.enum";
+import { HotelsService } from "../hotels/hotels.service";
 
 @Injectable()
 export class TourService {
   constructor(
     @InjectModel(Tour.name) private tourModel: Model<TourDocument>,
-    private readonly firebaseService: FirebaseService
+    private readonly firebaseService: FirebaseService,
+    private readonly hotelsService: HotelsService
   ) {}
 
   async createTour(
     createTourDto: CreateTourDto,
-    photo: Express.Multer.File
+    files: Express.Multer.File[]
   ): Promise<Tour> {
+    await this.hotelsService.findOne(createTourDto.hotelId);
+
+    const photos = await Promise.all(
+      (files || []).map(async (file) => {
+        return await this.firebaseService.uploadImage(file, Folder.TOURS);
+      })
+    );
+
     const newTour = {
       ...createTourDto,
-      photo: await this.firebaseService.uploadImage(photo, Folder.TOURS),
+      photos,
     };
 
     const createTour = new this.tourModel(newTour);
     return await createTour.save();
   }
 
-  async updateTour(id: string, updateTourDto: UpdateTourDto): Promise<Tour> {
-    const updatedTour = await this.tourModel
-      .findByIdAndUpdate(id, { $set: updateTourDto }, { new: true })
-      .exec();
+  async updateTour(
+    id: string,
+    updateTourDto: UpdateTourDto,
+    files: Express.Multer.File[]
+  ): Promise<Tour> {
+    await this.getSingleTour(id);
+    await this.hotelsService.findOne(updateTourDto.hotelId);
+    const newData = updateTourDto;
 
-    if (!updatedTour) {
-      throw new NotFoundException("Tour not found");
+    if (files) {
+      await Promise.all(
+        files.map(async (file) => {
+          newData.photos.push(
+            await this.firebaseService.uploadImage(file, Folder.HOTELS)
+          );
+        })
+      );
     }
+
+    const updatedTour = await this.tourModel
+      .findByIdAndUpdate(id, { $set: newData }, { new: true })
+      .exec();
 
     return updatedTour;
   }
 
-  // Delete tour
   async deleteTour(id: string): Promise<void> {
-    const result = await this.tourModel.findByIdAndDelete(id).exec();
+    const result = await this.tourModel.findById(id).exec();
+    result.isDeleted = true;
+    await result.save();
 
     if (!result) {
       throw new NotFoundException("Tour not found");
     }
   }
 
-  // Get a single tour
   async getSingleTour(id: string): Promise<Tour> {
     const tour = await this.tourModel.findById(id).populate("reviews").exec();
 
@@ -63,7 +87,6 @@ export class TourService {
     return tour;
   }
 
-  // Get all tours with pagination
   async getAllTours(
     query: GetTourRequestDto
   ): Promise<{ data: Tour[]; total: number }> {
@@ -85,12 +108,12 @@ export class TourService {
   async getTourBySearch(
     query: SearchTourRequestDto
   ): Promise<{ data: Tour[]; total: number }> {
-    const { city, groupSize, limit, page } = query;
+    const { title, groupSize, limit, page } = query;
     const offset = page * limit;
     const filter: any = {};
 
-    if (city) {
-      filter.city = new RegExp(city, "i");
+    if (title) {
+      filter.title = new RegExp(title, "i");
     }
     if (groupSize) {
       filter.maxGroupSize = { $gte: groupSize };
@@ -104,19 +127,5 @@ export class TourService {
     const total = await this.tourModel.countDocuments(filter).exec();
 
     return { data: tours, total };
-  }
-
-  async getFeaturedTours(): Promise<{ data: Tour[]; total: number }> {
-    const featuredTours = await this.tourModel
-      .find({ featured: true })
-      .populate("reviews")
-      .limit(9)
-      .exec();
-
-    const total = await this.tourModel
-      .countDocuments({ featured: true })
-      .exec();
-
-    return { data: featuredTours, total };
   }
 }
