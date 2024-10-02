@@ -1,8 +1,6 @@
 name: Docker
 
 on:
-  schedule:
-    - cron: "33 16 * * *" # Lịch trình chạy tự động
   push:
     branches: ["master"] # Khi có đẩy lên nhánh master
     tags: ["v*.*.*"] # Khi có nhãn theo định dạng semver
@@ -95,11 +93,11 @@ jobs:
 
           # Chạy container mới, bind port 8000
           docker run -d --restart unless-stopped \
-            -p 8000:8000 \
+            -p 8080:8080 \
             -e JWT_SECRET="travel-vietnam" \
             -e JWT_REFRESH_SECRET="travel-vietnam-refresh" \
             -e DATABASE_MONGO_SRC="mongodb+srv://stu715105064:ZeClf5THTVJyp5Jr@cluster0.yyq3k.mongodb.net/travel-social" \
-            -e PORT=8000 \
+            -e PORT=8080 \
             --name backend_container duynguyenhnue/travel-social-be:latest
           EOF
 
