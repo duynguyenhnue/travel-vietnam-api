@@ -11,6 +11,9 @@ import { ConfigModule } from "@nestjs/config";
 import { HotelsModule } from "./api/hotels/hotels.module";
 import { RoomsModule } from "./api/rooms/rooms.module";
 import { FirebaseModule } from "./api/firebase/firebase.module";
+import { TourModule } from './api/tour/tour.module';
+import { ReviewModule } from './api/review/review.module';
+import { BookingModule } from './api/booking/booking.module';
 
 @Module({
   imports: [
@@ -27,6 +30,9 @@ import { FirebaseModule } from "./api/firebase/firebase.module";
     HotelsModule,
     RoomsModule,
     FirebaseModule,
+    TourModule,
+    ReviewModule,
+    BookingModule,
   ],
   controllers: [],
   providers: [

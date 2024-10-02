@@ -1,23 +1,18 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
-import { Room } from "./room.schema";
 
-@Schema()
-export class Booking extends Document {
-  @Prop({ required: true })
-  booking_date: Date;
+export type BookingDocument = Booking & Document;
 
-  @Prop({ required: true })
-  check_in: Date;
+@Schema({ timestamps: true })
+export class Booking {
+  @Prop()
+  userId: string;
 
   @Prop({ required: true })
-  check_out: Date;
+  tourId: string;
 
   @Prop({ required: true })
-  customer: String;
-
-  @Prop({ required: true })
-  roomId: String;
+  guestSize: number;
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
