@@ -1,4 +1,10 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Body,
+  UseInterceptors,
+  UploadedFiles,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RefreshTokenRequest } from "../../payload/request/refresh-token.request";
 import { SkipAuth } from "../../config/skip.auth";
@@ -8,6 +14,7 @@ import {
   AuthLogoutRequest,
   AuthRequest,
 } from "../../payload/request/auth.request";
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller("auth")
 export class AuthController {
@@ -22,10 +29,16 @@ export class AuthController {
 
   @SkipAuth()
   @Post("register")
-  async register(@Body() createUserRequest: CreateUserRequest) {
-    const result = await this.authService.registerUser(createUserRequest);
+  @UseInterceptors(FilesInterceptor("files"))
+  async register(
+    @Body() createUserRequest: CreateUserRequest,
+    @UploadedFiles() files?: Express.Multer.File[]
+  ) {
+    const file = files && files.length > 0 ? files[0] : null;
+    const result = await this.authService.registerUser(createUserRequest, file);
     return successResponse(result);
   }
+
   @SkipAuth()
   @Post("refresh-token")
   async refreshToken(@Body() refreshTokenRequest: RefreshTokenRequest) {

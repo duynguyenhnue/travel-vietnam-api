@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "travel-vietnam-2cca2",
+  "private_key_id": "b6540fbb43848b89822d0963e6d18905023b38c3",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCaf5q+k+SPwTWt\n3F+WmuE8341z9rObfT/aWncFzG47XPgS5PdaEuktAuKu6dU3YxKMyAHOTOIKDuGL\nEsmeEb7i7fXEUGRxinXg9VTma7yDw7t4xvdFtbqJtLvnoERsjYbAh4S3IhzCe1ne\n2b0Mlsdx5+MhwzaHG52q+fxapMe8GcGnOYO/DFH8ltrBPnmnX4r6ZElqBFdFFTwc\n5r8e2BECNg7vLGo0bkgaD78jTqQPGDxYtSfOujiZ6V2tOIHoISU+vM2wKs/IT1P8\nO2aiQDAUOGK8b/nw674Z5YcK33/jxpjP/aMZ4S8WRt10f+l6PkvSywvUF80lF+aa\nK6S6xEtTAgMBAAECggEASALTCyIexdxd20Acs7NT6Y4fPd5On9o0sV86G9NJy9SM\n8i2TlwG6elbedn2Z+ltssX6lzNTsBJkkCjEDFXCbAuW8CDkaYAuT3vsqi83Ki7Xn\nAyfl6DGIlRfO/2qlid07YjCoLL2zHvjkjij540zCAHb/WGTHXRkDl8Y2F7+3MxYq\nvrUruzrFECxsFWXabPuO7wf8hcAxn355F5mT9PXPbBi91VKw+vLQlEVDcKJrG0V/\nNh8iCa4iWKp50WmyfQYy+IjpshaJetkjqXTTyGY1T1MtkGehOiI7uYhW4QyUxAxb\nDRhjBRVUQ78QTfcHl51452ySqV+XX5d4lO7odBaw2QKBgQDNUd2lL4/7mp0ZBeWF\nTbhvZIq12O3557XgArANk/ZDG68xtJUczYYOl+SCRQi5Rr70QiktrGHFBwTfpSSB\nQocZpFxQtTXpJVN6/82vdN04mUrw4X8LxnaUN8cGk93E+Y+yeLUgcnQPz7muzcyk\nTMAKrio9JLtFxC1NrxFrmhCUywKBgQDAolgoQbeg0OowAZHRnApTwHdc6ytYxUM6\ntpU24f0K3c4r8ZhgcRIF4gLyKfKQsFmP/1RXOEOCCUvL9cmGPcBLcv0e9BL8qGag\nJcdkDlLfxE32LDTyW7CyZMo6AV8zhRz/nP5/70qu35vpK8hOIqtEUOdFcqdql/l3\npd6t8iRamQKBgCrSyVzbp7c9j0iZzz5XcIFjQf8dqLz31BpN1TRvyOxESO0gEf24\n7B39Fj8JcQFbvRYq+nW5P4cdqKmQwyVmn9D8U/jNYtom29uKoPbYdA+LAXNuRNZK\n5Y6Sd6NqkdW0i4EY5gZHeOeXVs4bxHP8Qg24N70a/ShW+2/5dLOxpYWzAoGANWJI\nMA/WRbjfzaIBuScXLZKfAZ8iih1QvkqvG2CRcZt6cW8onUF4jyzNSDMbx8E3cNJ/\nmxQ6kSTmXoWk7ZDbY41gXF2jjWVV23fcw/u8N8r9GAW0Pp3uX+HSsTSEH5D6MlRd\nqzKzbbcGTB4YCp9M+0e4b+SQRNgNCH1tMqNyM7ECgYBWRAp6atgGgl8ziayKIhg1\nSWaJk3yDWzmcvR7aaQBjVfg0rMjdW91/k78XX2XMXBUSOaI5WHSk5nFKuUBV4i2+\nPXMbk/Yqxtf5QJnAnBD4nuuh1Za58L09rLhzRVU+3LUnPUzanf2fJYlK8TEkDjv7\nNJ5emwVcBpONyS4le1H07Q==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-s83o2@travel-vietnam-2cca2.iam.gserviceaccount.com",
+  "client_id": "117297000230148706048",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-s83o2%40travel-vietnam-2cca2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
