@@ -8,6 +8,12 @@ import { RefreshTokenModule } from "./api/refresh-token/refresh-token.module";
 import { RoleModule } from "./api/roles/role.module";
 import { PermissionModule } from "./api/permission/permission.module";
 import { ConfigModule } from "@nestjs/config";
+import { HotelsModule } from "./api/hotels/hotels.module";
+import { RoomsModule } from "./api/rooms/rooms.module";
+import { FirebaseModule } from "./api/firebase/firebase.module";
+import { TourModule } from './api/tour/tour.module';
+import { ReviewModule } from './api/review/review.module';
+import { BookingModule } from './api/booking/booking.module';
 
 @Module({
   imports: [
@@ -21,6 +27,12 @@ import { ConfigModule } from "@nestjs/config";
     RefreshTokenModule,
     RoleModule,
     PermissionModule,
+    HotelsModule,
+    RoomsModule,
+    FirebaseModule,
+    TourModule,
+    ReviewModule,
+    BookingModule,
   ],
   controllers: [],
   providers: [

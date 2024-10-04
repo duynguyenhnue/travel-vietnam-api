@@ -1,12 +1,9 @@
+import { Address, Phone } from "../request/users.request";
+
 export class UserResponse {
-  id: string;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
-  profilePictureUrl?: string;
-  bio?: string;
-  location?: string;
-  interests: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  dateOfBirth: string;
+  address: Address;
+  phone: Phone;
 }

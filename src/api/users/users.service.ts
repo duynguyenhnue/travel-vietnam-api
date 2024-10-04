@@ -9,8 +9,11 @@ import * as bcrypt from "bcryptjs";
 import { User } from "../../schema/user.schema";
 import {
   CreateUserRequest,
+  SearchUserRequest,
   UpdateUserRequest,
 } from "../../payload/request/users.request";
+import { UserResponse } from "src/payload/response/users.request";
+import { plainToInstance } from "class-transformer";
 
 @Injectable()
 export class UserService {
@@ -31,8 +34,48 @@ export class UserService {
     return user;
   }
 
+  async getUser(user: User): Promise<UserResponse> {
+    const userResponse = plainToInstance(UserResponse, user.toObject());
+    return userResponse;
+  }
+
+  async searchUsers(
+    query: SearchUserRequest
+  ): Promise<{ data: User[]; total: number }> {
+    const { limit = 6, page = 0 } = query;
+    const offset = page * limit;
+    const filter: any = {};
+
+    if (query.email) {
+      filter.email = { $regex: query.email, $options: "i" };
+    }
+
+    if (query.fullName) {
+      filter.fullName = { $regex: query.fullName, $options: "i" };
+    }
+
+    const data = await this.userModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
+      .exec();
+
+    const total = await this.userModel.countDocuments(filter).exec();
+
+    return {
+      data: data,
+      total,
+    };
+  }
+
   async findUserById(id: any): Promise<User> {
     const user = await this.userModel.findById(id).exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
     return user;
   }
 
