@@ -8,22 +8,41 @@ import {
   InternalServerErrorException,
   NotFoundException,
   HttpStatus,
+  Req,
+  Query,
 } from "@nestjs/common";
 import { UserService } from "./users.service";
 import { User } from "../../schema/user.schema";
-import { UpdateUserRequest } from "../../payload/request/users.request";
+import {
+  SearchUserRequest,
+  UpdateUserRequest,
+} from "../../payload/request/users.request";
 import { CommonException } from "../../common/exception/common.exception";
 import { successResponse } from "../../common/dto/response.dto";
+import { Request } from "supertest";
+import { UserResponse } from "src/payload/response/users.request";
+import { plainToInstance } from "class-transformer";
 
 @Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get(":id")
-  async getUser(@Param("id") id: string) {
+  @Get()
+  async getUser(@Req() req) {
     try {
-      const result = await this.userService.findUserById(id);
-      return successResponse(result);
+      return successResponse(await this.userService.getUser(req.user));
+    } catch (error) {
+      throw new CommonException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get("search")
+  async search(@Query() query: SearchUserRequest) {
+    try {
+      return successResponse(await this.userService.searchUsers(query));
     } catch (error) {
       throw new CommonException(
         error.message,

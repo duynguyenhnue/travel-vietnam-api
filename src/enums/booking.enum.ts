@@ -3,6 +3,11 @@ export enum BookingStatus {
   CANCELLED = "CANCELLED",
 }
 
+export enum BookingType {
+  HOTELS = "HOTELS",
+  TOURS = "TOURS",
+}
+
 export enum TourStatus {
   PENDING = "PENDING",
   INPROGRESS = "INPROGRESS",

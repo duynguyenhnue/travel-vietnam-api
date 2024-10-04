@@ -6,9 +6,9 @@ import {
   IsBoolean,
   IsDateString,
   Length,
-} from 'class-validator';
+} from "class-validator";
 
-class Address {
+export class Address {
   @IsString()
   @IsNotEmpty()
   province: string;
@@ -22,7 +22,7 @@ class Address {
   ward: string;
 }
 
-class Phone {
+export class Phone {
   @IsString()
   @IsNotEmpty()
   country: string;
@@ -88,4 +88,22 @@ export class UpdateUserRequest {
   @IsString()
   @IsOptional()
   status?: string;
+}
+
+export class SearchUserRequest {
+  @IsString()
+  @IsNotEmpty()
+  page: number;
+
+  @IsString()
+  @IsNotEmpty()
+  limit: number;
+
+  @IsString()
+  @IsOptional()
+  fullName?: string;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
 }

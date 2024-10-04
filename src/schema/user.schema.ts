@@ -27,14 +27,17 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
+  @Prop({ default: null })
+  avatar: string;
+
   @Prop({ required: true })
   fullName: string;
 
   @Prop({ required: true })
   password: string;
 
-  @Prop()
-  dateOfBirth: Date | null;
+  @Prop({ required: true })
+  dateOfBirth: Date;
 
   @Prop({ type: Address, required: true })
   address: Address;
@@ -42,10 +45,10 @@ export class User extends Document {
   @Prop({ type: Phone, required: true })
   phone: Phone;
 
-  @Prop({ default: 'USER' })
+  @Prop({ default: "USER" })
   role: string;
 
-  @Prop({ default: 'ACTIVE' })
+  @Prop({ default: "ACTIVE" })
   status: string;
 
   @Prop({ default: Date.now })

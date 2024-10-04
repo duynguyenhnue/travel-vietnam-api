@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
-import { BookingStatus } from "src/enums/booking.enum";
+import { BookingStatus, BookingType } from "src/enums/booking.enum";
 
 export type BookingDocument = Booking & Document;
 
@@ -14,6 +14,9 @@ export class Booking {
 
   @Prop({ required: true })
   status: BookingStatus;
+
+  @Prop({ required: true })
+  bookingType: BookingType;
 
   @Prop({ required: true })
   guestSize: number;

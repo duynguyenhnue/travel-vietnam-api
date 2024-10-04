@@ -7,6 +7,7 @@ import { UserModule } from "../users/users.module";
 import { JwtStrategy } from "../../common/guards/jwtStratergy";
 import { RefreshTokenModule } from "../refresh-token/refresh-token.module";
 import { UserService } from "../users/users.service";
+import { FirebaseModule } from "../firebase/firebase.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserService } from "../users/users.service";
     }),
     forwardRef(() => UserModule),
     forwardRef(() => RefreshTokenModule),
+    forwardRef(() => FirebaseModule),
   ],
 
   controllers: [AuthController],
