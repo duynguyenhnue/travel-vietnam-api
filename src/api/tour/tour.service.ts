@@ -11,13 +11,18 @@ import { Tour, TourDocument } from "src/schema/tour.schema";
 import { FirebaseService } from "../firebase/firebase.service";
 import { Folder } from "src/enums/folder.enum";
 import { HotelsService } from "../hotels/hotels.service";
+import { ReviewService } from "../review/review.service";
+import { promises } from "dns";
+import { TourResponse } from "src/payload/response/tours.response";
+import { plainToInstance } from "class-transformer";
 
 @Injectable()
 export class TourService {
   constructor(
     @InjectModel(Tour.name) private tourModel: Model<TourDocument>,
     private readonly firebaseService: FirebaseService,
-    private readonly hotelsService: HotelsService
+    private readonly hotelsService: HotelsService,
+    private readonly reviewService: ReviewService
   ) {}
 
   async createTour(
@@ -77,14 +82,18 @@ export class TourService {
     }
   }
 
-  async getSingleTour(id: string): Promise<Tour> {
+  async getSingleTour(id: string): Promise<TourResponse> {
     const tour = await this.tourModel.findById(id).populate("reviews").exec();
 
     if (!tour) {
       throw new NotFoundException("Tour not found");
     }
 
-    return tour;
+    const reviews = await this.reviewService.getReviews(
+      tour.reviews as unknown as string[]
+    );
+
+    return { ...tour.toObject(), reviews };
   }
 
   async getAllTours(
@@ -107,7 +116,7 @@ export class TourService {
 
   async getTourBySearch(
     query: SearchTourRequestDto
-  ): Promise<{ data: Tour[]; total: number }> {
+  ): Promise<{ data: TourResponse[]; total: number }> {
     const { title, groupSize, limit, page } = query;
     const offset = page * limit;
     const filter: any = {};
@@ -118,14 +127,32 @@ export class TourService {
     if (groupSize) {
       filter.maxGroupSize = { $gte: groupSize };
     }
+
+    if (query.price) {
+      filter.price = { $lte: query.price };
+    }
+
+    if (query.status.length > 0) {
+      filter.status = query.status;
+    }
+
     const tours = await this.tourModel
       .find(filter)
       .sort({ createdAt: -1 })
       .skip(offset)
       .exec();
 
+    const toursMap: TourResponse[] = await Promise.all(
+      tours.map(async (tour) => {
+        const reviews = await this.reviewService.getReviews(
+          tour.reviews as unknown as string[]
+        );
+        return { ...tour.toObject(), reviews };
+      })
+    );
+
     const total = await this.tourModel.countDocuments(filter).exec();
 
-    return { data: tours, total };
+    return { data: toursMap, total };
   }
 }
