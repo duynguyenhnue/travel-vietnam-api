@@ -68,10 +68,10 @@ export class TourController {
     }
   }
 
-  @Delete(":id")
+  @Delete("/cancel/:id")
   async cancelTour(@Param("id", ParseObjectIdPipe) id: string) {
     try {
-      await this.tourService.deleteTour(id);
+      await this.tourService.cancelTour(id);
       return successResponse("Successfully cancel tour");
     } catch (error) {
       throw new CommonException(
@@ -114,6 +114,20 @@ export class TourController {
     try {
       const tours = await this.tourService.getTourBySearch(query);
       return successResponse(tours);
+    } catch (error) {
+      throw new CommonException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @SkipAuth()
+  @Delete(":id")
+  async deleteTour(@Param("id", ParseObjectIdPipe) id: string) {
+    try {
+      const tours = await this.tourService.deleteTour(id);
+      return successResponse("Successfully delete tour");
     } catch (error) {
       throw new CommonException(
         error.message,

@@ -48,7 +48,7 @@ export class HotelsController {
     }
   }
 
-  @Get()
+  @Get("/search")
   @SkipAuth()
   async searchHotel(@Query() query: searchHotelIdRequestDto) {
     return successResponse(await this.hotelsService.searchHotel(query));

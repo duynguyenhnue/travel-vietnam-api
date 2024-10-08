@@ -13,4 +13,5 @@ export enum TourStatus {
   INPROGRESS = "INPROGRESS",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
+  DELETED = "DELETED",
 }

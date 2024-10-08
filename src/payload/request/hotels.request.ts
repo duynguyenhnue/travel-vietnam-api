@@ -10,20 +10,18 @@ import {
   Matches,
   Min,
   IsInt,
+  IsNotEmpty,
+  ValidateNested,
 } from "class-validator";
+import { Address } from "./users.request";
 
 export class CreateHotelRequestDto {
   @IsString()
   name: string;
 
-  @IsString()
-  address: string;
-
-  @IsString()
-  @Matches(/^(1(\.0)?|2(\.[0-9])?|3(\.[0-9])?|4(\.[0-9])?|5(\.0)?)$/, {
-    message: "Rating must be a string between '1.0' and '5.0'",
-  })
-  rating: string;
+  @ValidateNested()
+  @Type(() => Address)
+  address: Address;
 
   @IsString()
   description: string;
@@ -33,17 +31,9 @@ export class CreateHotelRequestDto {
   @IsString({ each: true })
   amenities: string[];
 
-  @IsOptional()
+  @Matches(/^\d+$/, { message: "Price must be a numeric string." })
   @IsString()
-  checkInPolicy: string;
-
-  @IsOptional()
-  @IsString()
-  checkOutPolicy: string;
-
-  @IsOptional()
-  @IsString()
-  cancellationPolic: string;
+  price: number;
 }
 
 export class UpdateHotelRequestDto extends PartialType(CreateHotelRequestDto) {

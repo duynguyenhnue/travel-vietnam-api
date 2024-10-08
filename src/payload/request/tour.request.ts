@@ -13,8 +13,10 @@ import {
   IsDate,
   IsDateString,
   ValidateNested,
+  IsEnum,
 } from "class-validator";
 import { ObjectId, Types } from "mongoose";
+import { TourStatus } from "src/enums/booking.enum";
 
 class Address {
   @IsString()
@@ -46,9 +48,9 @@ export class CreateTourDto {
   price: number;
 
   @IsNotEmpty()
-  @Matches(/^[1-9]$/, {
+  @Matches(/^(1|[1-4][0-9]|50)$/, {
     message:
-      "MaxGroupSize must be a string containing a number between '1' and '9'.",
+      "MaxGroupSize must be a string containing a number between '1' and '50'.",
   })
   maxGroupSize: number;
 
@@ -80,7 +82,7 @@ export class UpdateTourDto extends PartialType(CreateTourDto) {
 
 export class GetTourRequestDto {
   @Type(() => Number)
-  @Min(9)
+  @Min(0)
   limit: number;
 
   @Type(() => Number)
@@ -94,11 +96,13 @@ export class SearchTourRequestDto extends GetTourRequestDto {
   title?: string;
 
   @IsOptional()
-  @Matches(/^(?:[1-9]|[1-4][0-9]|50)$/, {
-    message:
-      "MaxGroupSize must be a string containing a number between '1' and '50'.",
-  })
   groupSize?: number;
+
+  @IsOptional()
+  price?: number;
+
+  @IsOptional()
+  status?: TourStatus;
 }
 
 export class CreateReviewRequest {

@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, ObjectId } from "mongoose";
 import { CreateReviewRequest } from "src/payload/request/tour.request";
 import { Review, ReviewDocument } from "src/schema/review.schema";
 import { Tour, TourDocument } from "src/schema/tour.schema";
@@ -12,6 +17,7 @@ export class ReviewService {
   constructor(
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
     @InjectModel(Tour.name) private tourModel: Model<TourDocument>,
+    @Inject(forwardRef(() => TourService))
     private readonly tourService: TourService,
     private readonly userService: UserService
   ) {}
@@ -43,5 +49,29 @@ export class ReviewService {
     }
 
     return savedReview;
+  }
+
+  async getReviews(tourId: string[]): Promise<Review[]> {
+    const reviews = await this.reviewModel
+      .find({ _id: { $in: tourId } })
+      .exec();
+
+    if (!reviews) {
+      throw new NotFoundException("Review not found");
+    }
+
+    return reviews;
+  }
+
+  async getReviewsRating(tourId: string[]): Promise<Review[]> {
+    const reviews = await this.reviewModel
+      .find({ _id: { $in: tourId } }, { _id: 0, rating: 1 })
+      .exec();
+
+    if (!reviews) {
+      throw new NotFoundException("Review not found");
+    }
+
+    return reviews;
   }
 }
