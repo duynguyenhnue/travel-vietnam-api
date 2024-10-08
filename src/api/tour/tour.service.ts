@@ -15,6 +15,7 @@ import { ReviewService } from "../review/review.service";
 import { promises } from "dns";
 import { TourResponse } from "src/payload/response/tours.response";
 import { plainToInstance } from "class-transformer";
+import { TourStatus } from "src/enums/booking.enum";
 
 @Injectable()
 export class TourService {
@@ -72,9 +73,27 @@ export class TourService {
     return updatedTour;
   }
 
+  async cancelTour(id: string): Promise<void> {
+    const result = await this.tourModel.findById(id).exec();
+    if (result.isCancel) {
+      throw new NotFoundException("Tour is already canceled");
+    }
+    result.isCancel = true;
+    result.status = TourStatus.CANCELLED;
+    await result.save();
+
+    if (!result) {
+      throw new NotFoundException("Tour not found");
+    }
+  }
+
   async deleteTour(id: string): Promise<void> {
     const result = await this.tourModel.findById(id).exec();
+    if (result.isDeleted) {
+      throw new NotFoundException("Tour is already deleted");
+    }
     result.isDeleted = true;
+    result.status = TourStatus.DELETED;
     await result.save();
 
     if (!result) {
@@ -119,7 +138,9 @@ export class TourService {
   ): Promise<{ data: TourResponse[]; total: number }> {
     const { title, groupSize, limit, page } = query;
     const offset = page * limit;
-    const filter: any = {};
+    const filter: any = {
+      isDeleted: false,
+    };
 
     if (title) {
       filter.title = new RegExp(title, "i");
@@ -132,7 +153,7 @@ export class TourService {
       filter.price = { $lte: query.price };
     }
 
-    if (query.status.length > 0) {
+    if (query.status) {
       filter.status = query.status;
     }
 
@@ -140,6 +161,7 @@ export class TourService {
       .find(filter)
       .sort({ createdAt: -1 })
       .skip(offset)
+      .limit(limit)
       .exec();
 
     const toursMap: TourResponse[] = await Promise.all(

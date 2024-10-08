@@ -32,7 +32,7 @@ export class Tour {
   @Prop({ required: true })
   maxGroupSize: number;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: "hotels" }], required: true })
+  @Prop({ type: Types.ObjectId, ref: "hotels", required: true })
   hotelId: Types.ObjectId;
 
   @Prop({ required: true, default: TourStatus.PENDING })
@@ -58,6 +58,9 @@ export class Tour {
 
   @Prop({ default: false })
   isDeleted: boolean;
+
+  @Prop({ default: false })
+  isCancel: boolean;
 }
 
 export const TourSchema = SchemaFactory.createForClass(Tour);

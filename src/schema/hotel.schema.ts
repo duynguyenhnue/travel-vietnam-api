@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
+import { Address } from "src/payload/request/users.request";
 
 @Schema({ timestamps: true })
 export class Hotel extends Document {
@@ -7,10 +8,13 @@ export class Hotel extends Document {
   name: string;
 
   @Prop({ required: true })
-  address: string;
+  address: Address;
 
   @Prop({ required: true })
-  rating: number;
+  price: number;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: "review" }] })
+  reviews: Types.ObjectId[];
 
   @Prop()
   description: string;
@@ -19,16 +23,7 @@ export class Hotel extends Document {
   amenities: string[];
 
   @Prop([String])
-  images: string[];
-
-  @Prop()
-  checkInPolicy: string;
-
-  @Prop()
-  checkOutPolicy: string;
-
-  @Prop()
-  cancellationPolicy: string;
+  photos: string[];
 }
 
 export const HotelSchema = SchemaFactory.createForClass(Hotel);

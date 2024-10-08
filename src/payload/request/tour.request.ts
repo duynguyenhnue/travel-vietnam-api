@@ -48,9 +48,9 @@ export class CreateTourDto {
   price: number;
 
   @IsNotEmpty()
-  @Matches(/^[1-9]$/, {
+  @Matches(/^(1|[1-4][0-9]|50)$/, {
     message:
-      "MaxGroupSize must be a string containing a number between '1' and '9'.",
+      "MaxGroupSize must be a string containing a number between '1' and '50'.",
   })
   maxGroupSize: number;
 
@@ -102,7 +102,6 @@ export class SearchTourRequestDto extends GetTourRequestDto {
   price?: number;
 
   @IsOptional()
-  @IsEnum(TourStatus)
   status?: TourStatus;
 }
 

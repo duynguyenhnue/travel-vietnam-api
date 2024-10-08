@@ -1,39 +1,19 @@
 import { Exclude, Expose } from "class-transformer";
+import { Types } from "mongoose";
+import { Address } from "../request/users.request";
 
 export class HotelResponseDto {
-  @Expose()
-  readonly id: string;
+  name: string;
 
-  @Expose()
-  readonly name: string;
+  address: Address;
 
-  @Expose()
-  readonly address: string;
+  price: number;
 
-  @Expose()
-  readonly rating: number;
+  reviews: Types.ObjectId[];
 
-  @Expose()
-  readonly description: string;
+  description: string;
 
-  @Expose()
-  readonly amenities: string[];
+  amenities: string[];
 
-  @Expose()
-  readonly images: string[];
-
-  @Expose()
-  readonly checkInPolicy: string;
-
-  @Expose()
-  readonly checkOutPolicy: string;
-
-  @Expose()
-  readonly cancellationPolicy: string;
-
-  @Exclude()
-  private readonly createdAt: Date;
-
-  @Exclude()
-  private readonly updatedAt: Date;
+  photos: string[];
 }

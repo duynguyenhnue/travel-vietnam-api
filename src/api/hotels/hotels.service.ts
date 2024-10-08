@@ -24,7 +24,7 @@ export class HotelsService {
     createHotelDto: CreateHotelRequestDto,
     files: Express.Multer.File[]
   ): Promise<HotelResponseDto> {
-    const images = await Promise.all(
+    const photos = await Promise.all(
       (files || []).map(async (file) => {
         return await this.firebaseService.uploadImage(file, Folder.HOTELS);
       })
@@ -32,7 +32,7 @@ export class HotelsService {
 
     const data = {
       ...createHotelDto,
-      images,
+      photos,
     };
 
     const createdHotel = new this.hotelModel(data);
