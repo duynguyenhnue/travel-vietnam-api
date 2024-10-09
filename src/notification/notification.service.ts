@@ -11,11 +11,11 @@ export class NotificationService implements OnModuleInit, OnModuleDestroy {
     this.socket = require("socket.io-client")(process.env.WEBSOCKET_URL);
 
     this.socket.on("connect", () => {
-      console.log("Connected to WebSocket server on port 8081");
+      console.log("Connected to WebSocket server on port 6666");
     });
 
     this.socket.on("disconnect", () => {
-      console.log("Disconnected from WebSocket server on port 8081");
+      console.log("Disconnected from WebSocket server on port 6666");
     });
   }
 
