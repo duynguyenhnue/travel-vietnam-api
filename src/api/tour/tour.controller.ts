@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFiles,
+  Req,
 } from "@nestjs/common";
 import { TourService } from "./tour.service";
 import { successResponse } from "src/common/dto/response.dto";
@@ -23,20 +24,33 @@ import {
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { SkipAuth } from "src/config/skip.auth";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
+import { NotificationService } from "src/notification/notification.service";
 
 @Controller("tours")
 export class TourController {
-  constructor(private readonly tourService: TourService) {}
+  constructor(
+    private readonly tourService: TourService,
+    private readonly notificationService: NotificationService
+  ) {}
 
   @SkipAuth()
   @Post()
   @UseInterceptors(FilesInterceptor("files"))
   async createTour(
     @Body() createTourDto: CreateTourDto,
-    @UploadedFiles() files: Express.Multer.File[]
+    @UploadedFiles() files: Express.Multer.File[],
+    @Req() req
   ) {
     try {
       const savedTour = await this.tourService.createTour(createTourDto, files);
+      this.notificationService.logNotification({
+        title: "New Tour Created",
+        message: `New tour ${savedTour.title} has been created`,
+        id: req.user.id,
+        avatar: req.user.avatar,
+        name: req.user.name,
+        action: "create",
+      });
       return successResponse(savedTour);
     } catch (error) {
       throw new CommonException(
@@ -51,7 +65,8 @@ export class TourController {
   async updateTour(
     @Param("id", ParseObjectIdPipe) id: string,
     @Body() updateTourDto: UpdateTourDto,
-    @UploadedFiles() files: Express.Multer.File[]
+    @UploadedFiles() files: Express.Multer.File[],
+    @Req() req
   ) {
     try {
       const updatedTour = await this.tourService.updateTour(
@@ -59,6 +74,14 @@ export class TourController {
         updateTourDto,
         files
       );
+      this.notificationService.logNotification({
+        title: "Update Tour Created",
+        message: `Update tour ${updatedTour.title} has been created`,
+        id: req.user.id,
+        avatar: req.user.avatar,
+        name: req.user.fullName,
+        action: "create",
+      });
       return successResponse(updatedTour);
     } catch (error) {
       throw new CommonException(
@@ -124,9 +147,18 @@ export class TourController {
 
   @SkipAuth()
   @Delete(":id")
-  async deleteTour(@Param("id", ParseObjectIdPipe) id: string) {
+  async deleteTour(@Param("id", ParseObjectIdPipe) id: string, @Req() req) {
     try {
       const tours = await this.tourService.deleteTour(id);
+
+      this.notificationService.logNotification({
+        title: "Update Tour Created",
+        message: `Update tour ${tours.title} has been created`,
+        id: req.user.id,
+        avatar: req.user.avatar,
+        name: req.user.fullName,
+        action: "create",
+      });
       return successResponse("Successfully delete tour");
     } catch (error) {
       throw new CommonException(

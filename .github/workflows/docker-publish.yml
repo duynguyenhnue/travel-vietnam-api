@@ -71,7 +71,7 @@ jobs:
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
           DATABASE_MONGO_SRC: ${{ secrets.DATABASE_MONGO_SRC }}
           PORT: 8000 # Cổng mặc định của server, có thể điều chỉnh nếu cần
-        
+
         run: |
           # Tạo file private key tạm thời
           echo "${PRIVATE_KEY}" > private_key.pem
@@ -97,7 +97,7 @@ jobs:
             -e JWT_SECRET="travel-vietnam" \
             -e JWT_REFRESH_SECRET="travel-vietnam-refresh" \
             -e DATABASE_MONGO_SRC="mongodb+srv://stu715105064:ZeClf5THTVJyp5Jr@cluster0.yyq3k.mongodb.net/travel-social" \
-            -e WEBSOCKET_URL=http://139.59.107.77:8081 \
+            -e WEBSOCKET_URL=http://139.59.107.77:6666 \
             -e PORT=8080 \
             --name travel_backend_container duynguyenhnue/travel-vietnam-api:latest
           EOF

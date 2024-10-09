@@ -14,6 +14,7 @@ import { FirebaseModule } from "./api/firebase/firebase.module";
 import { TourModule } from './api/tour/tour.module';
 import { ReviewModule } from './api/review/review.module';
 import { BookingModule } from './api/booking/booking.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { BookingModule } from './api/booking/booking.module';
     TourModule,
     ReviewModule,
     BookingModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [
