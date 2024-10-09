@@ -97,6 +97,7 @@ jobs:
             -e JWT_SECRET="travel-vietnam" \
             -e JWT_REFRESH_SECRET="travel-vietnam-refresh" \
             -e DATABASE_MONGO_SRC="mongodb+srv://stu715105064:ZeClf5THTVJyp5Jr@cluster0.yyq3k.mongodb.net/travel-social" \
+            -e WEBSOCKET_URL=http://139.59.107.77:8081 \
             -e PORT=8080 \
             --name travel_backend_container duynguyenhnue/travel-vietnam-api:latest
           EOF
