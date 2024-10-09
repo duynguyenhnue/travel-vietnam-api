@@ -87,7 +87,7 @@ export class TourService {
     }
   }
 
-  async deleteTour(id: string): Promise<void> {
+  async deleteTour(id: string): Promise<Tour> {
     const result = await this.tourModel.findById(id).exec();
     if (result.isDeleted) {
       throw new NotFoundException("Tour is already deleted");
@@ -99,6 +99,7 @@ export class TourService {
     if (!result) {
       throw new NotFoundException("Tour not found");
     }
+    return result;
   }
 
   async getSingleTour(id: string): Promise<TourResponse> {
