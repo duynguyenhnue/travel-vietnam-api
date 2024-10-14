@@ -17,20 +17,20 @@ import {
   UpdateHotelRequestDto,
   searchHotelIdRequestDto,
 } from "src/payload/request/hotels.request";
-import { HotelResponseDto } from "src/payload/response/hotels.response";
 import { SkipAuth } from "src/config/skip.auth";
-import { FileUploadInterceptor } from "../firebase/file.interceptor";
 import { CommonException } from "src/common/exception/common.exception";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { ObjectId } from "mongoose";
 import { successResponse } from "src/common/dto/response.dto";
+import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
+import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 
 @Controller("hotels")
 export class HotelsController {
   constructor(private readonly hotelsService: HotelsService) {}
 
   @Post()
-  @SkipAuth()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.HOTEL_CREATE)
   @UseInterceptors(FilesInterceptor("files"))
   async create(
     @UploadedFiles() files: Express.Multer.File[],
@@ -67,8 +67,8 @@ export class HotelsController {
     }
   }
 
-  @SkipAuth()
   @Put(":id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.HOTEL_UPDATE)
   @UseInterceptors(FilesInterceptor("files"))
   async update(
     @Param("id") id: ObjectId,
@@ -87,8 +87,8 @@ export class HotelsController {
     }
   }
 
-  @SkipAuth()
   @Delete(":id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.HOTEL_DELETE)
   async delete(@Param("id") id: ObjectId) {
     try {
       return successResponse(await this.hotelsService.delete(id));

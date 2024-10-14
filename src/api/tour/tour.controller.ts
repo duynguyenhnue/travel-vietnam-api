@@ -17,7 +17,6 @@ import { successResponse } from "src/common/dto/response.dto";
 import { CommonException } from "src/common/exception/common.exception";
 import {
   CreateTourDto,
-  GetTourRequestDto,
   SearchTourRequestDto,
   UpdateTourDto,
 } from "src/payload/request/tour.request";
@@ -25,6 +24,8 @@ import { FilesInterceptor } from "@nestjs/platform-express";
 import { SkipAuth } from "src/config/skip.auth";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
 import { NotificationService } from "../notification/notification.service";
+import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
+import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 
 @Controller("tours")
 export class TourController {
@@ -33,8 +34,8 @@ export class TourController {
     private readonly notificationService: NotificationService
   ) {}
 
-  @SkipAuth()
   @Post()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.TOUR_CREATE)
   @UseInterceptors(FilesInterceptor("files"))
   async createTour(
     @Body() createTourDto: CreateTourDto,
@@ -61,6 +62,7 @@ export class TourController {
   }
 
   @Put(":id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.TOUR_UPDATE)
   @UseInterceptors(FilesInterceptor("files"))
   async updateTour(
     @Param("id", ParseObjectIdPipe) id: string,
@@ -92,6 +94,7 @@ export class TourController {
   }
 
   @Delete("/cancel/:id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.TOUR_DELETE)
   async cancelTour(@Param("id", ParseObjectIdPipe) id: string) {
     try {
       await this.tourService.cancelTour(id);
@@ -103,7 +106,6 @@ export class TourController {
       );
     }
   }
-  @SkipAuth()
   @Get("get/:id")
   async getSingleTour(@Param("id", ParseObjectIdPipe) id: string) {
     try {
@@ -116,21 +118,6 @@ export class TourController {
       );
     }
   }
-
-  @SkipAuth()
-  @Get()
-  async getAllTours(@Query() query: GetTourRequestDto) {
-    try {
-      const tours = await this.tourService.getAllTours(query);
-      return successResponse(tours);
-    } catch (error) {
-      throw new CommonException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
   @SkipAuth()
   @Get("search")
   async getTourBySearch(@Query() query: SearchTourRequestDto) {
@@ -145,8 +132,8 @@ export class TourController {
     }
   }
 
-  @SkipAuth()
   @Delete(":id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.TOUR_DELETE)
   async deleteTour(@Param("id", ParseObjectIdPipe) id: string, @Req() req) {
     try {
       const tours = await this.tourService.deleteTour(id);

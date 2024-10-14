@@ -17,21 +17,22 @@ import {
   SearchRoomRequestDto,
   UpdateRoomRequestDto,
 } from "src/payload/request/rooms.request";
-import { RoomResponseDto } from "src/payload/response/room.response";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { SkipAuth } from "src/config/skip.auth";
 import { ObjectId } from "mongoose";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
 import { CommonException } from "src/common/exception/common.exception";
 import { successResponse } from "src/common/dto/response.dto";
+import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
+import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 
 @Controller("rooms")
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post()
-  @SkipAuth()
   @UseInterceptors(FilesInterceptor("files"))
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROOM_CREATE)
   async create(
     @Body() createRoomDto: CreateRoomRequestDto,
     @UploadedFiles() files: Express.Multer.File[]
@@ -80,7 +81,7 @@ export class RoomsController {
   }
 
   @Put(":id")
-  @SkipAuth()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROOM_UPDATE)
   async update(
     @Param("id") id: string,
     @Body() updateRoomDto: UpdateRoomRequestDto
@@ -96,7 +97,7 @@ export class RoomsController {
   }
 
   @Delete(":id")
-  @SkipAuth()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROOM_DELETE)
   async delete(@Param("id") id: string) {
     try {
       return successResponse(await this.roomsService.delete(id));

@@ -1,17 +1,18 @@
 import { Controller, Post, Param, Body, HttpStatus } from "@nestjs/common";
 import { ReviewService } from "./review.service";
 import { successResponse } from "src/common/dto/response.dto";
-import { SkipAuth } from "src/config/skip.auth";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
 import { CreateReviewRequest } from "src/payload/request/tour.request";
 import { CommonException } from "src/common/exception/common.exception";
+import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
+import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 
 @Controller("tours/:tourId/reviews")
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @SkipAuth()
   @Post()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.REVIEW_CREATE)
   async createReview(
     @Param("tourId", ParseObjectIdPipe) tourId: string,
     @Body() createReviewDto: CreateReviewRequest
