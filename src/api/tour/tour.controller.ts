@@ -24,7 +24,7 @@ import {
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { SkipAuth } from "src/config/skip.auth";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
-import { NotificationService } from "src/notification/notification.service";
+import { NotificationService } from "../notification/notification.service";
 
 @Controller("tours")
 export class TourController {

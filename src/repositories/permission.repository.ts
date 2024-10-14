@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Permission, PermissionDocument } from "../schema/permission.schema";
+import { Status } from "src/enums/permission.enum";
 
 @Injectable()
 export class PermissionRepository {
@@ -14,26 +15,41 @@ export class PermissionRepository {
     const permission = new this.permissionModel(permissionDocument);
     return await permission.save();
   }
+  async createOrUpdate(permissionDocument: Partial<PermissionDocument>) {
+    return await this.permissionModel
+      .findOneAndUpdate({ code: permissionDocument.code }, permissionDocument, {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      })
+      .exec();
+  }
 
-  async getListPermissions(
-    offset: number,
-    limit: number
-  ): Promise<{ data: PermissionDocument[]; total: number }> {
+  async getListPermissions(): Promise<PermissionDocument[]> {
     const data = await this.permissionModel
-      .find()
+      .find({ status: Status.PUBLISHED })
       .sort({ createdAt: -1 })
-      .skip(offset)
-      .limit(limit)
       .exec();
-    const total = await this.permissionModel
-      .countDocuments({ isDeleted: false })
-      .exec();
-    return { data, total };
+
+    return data;
+  }
+
+  async getAll(): Promise<PermissionDocument[]> {
+    const data = await this.permissionModel.find().exec();
+    return data;
   }
 
   async findById(id: string): Promise<PermissionDocument> {
     const objectId = new Types.ObjectId(id);
     return this.permissionModel.findById(objectId).exec();
+  }
+
+  async findByIds(ids: string[]): Promise<string[]> {
+    const objectIds = ids.map((id) => new Types.ObjectId(id));
+    const permissions = await this.permissionModel
+      .find({ _id: { $in: objectIds } }, "name")
+      .exec();
+    return permissions.map((permission) => permission.name);
   }
 
   async findByPermissionId(
@@ -59,7 +75,7 @@ export class PermissionRepository {
     });
   }
 
-  async findByCodes(codes: string[]): Promise<PermissionDocument[]> {
-    return this.permissionModel.find({ code: { $in: codes } }).exec();
+  async findByCodes(code: string): Promise<PermissionDocument> {
+    return this.permissionModel.findOne({ code }).exec();
   }
 }

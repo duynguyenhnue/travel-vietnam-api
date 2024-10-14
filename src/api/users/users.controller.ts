@@ -19,9 +19,6 @@ import {
 } from "../../payload/request/users.request";
 import { CommonException } from "../../common/exception/common.exception";
 import { successResponse } from "../../common/dto/response.dto";
-import { Request } from "supertest";
-import { UserResponse } from "src/payload/response/users.request";
-import { plainToInstance } from "class-transformer";
 
 @Controller("users")
 export class UserController {

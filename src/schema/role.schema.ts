@@ -15,9 +15,6 @@ import { Status } from "../enums/role.enum";
 })
 export class Role extends Document {
   @Prop({ unique: true })
-  role: string;
-
-  @Prop()
   name: string;
 
   @Prop()
@@ -29,6 +26,7 @@ export class Role extends Document {
   @Prop({
     type: String,
     enum: Object.values(Status),
+    default: Status.INACTIVATED,
   })
   status: Status;
 

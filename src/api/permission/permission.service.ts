@@ -1,34 +1,52 @@
 import { Injectable } from "@nestjs/common";
-import { CreateAndUpdatePermissionRequest } from "../../payload/request/permission.request";
+import { UpdateStatusPermissionRequest } from "../../payload/request/permission.request";
 import { GetListPermissionResponse } from "../../payload/response/permission.response";
 import { PermissionRepository } from "../../repositories/permission.repository";
 import { PermissionDocument } from "../../schema/permission.schema";
+import { AUTH_ROLES } from "src/enums/auth.enum";
+import { Status } from "src/enums/role.enum";
 
 @Injectable()
 export class PermissionService {
   constructor(private readonly permissionRepository: PermissionRepository) {}
 
-  async createPermission(
-    request: CreateAndUpdatePermissionRequest
-  ): Promise<PermissionDocument> {
-    const permissionToSave = { ...request };
-    return await this.permissionRepository.create(permissionToSave);
+  async onModuleInit() {
+    await this.createPermissions();
   }
 
-  async getListPermissions(
-    page: number,
-    limit: number
-  ): Promise<GetListPermissionResponse> {
-    const offset = (page - 1) * limit;
-    const { data: permissions, total } =
-      await this.permissionRepository.getListPermissions(offset, limit);
-    return {
-      data: permissions,
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    };
+  async createPermissions() {
+    const permissions = this.getAllPermissions();
+    for (const permission of permissions) {
+      await this.permissionRepository.createOrUpdate(permission);
+    }
+  }
+
+  getAllPermissions() {
+    const permissionsArray = [];
+
+    for (const group in AUTH_ROLES) {
+      if (AUTH_ROLES.hasOwnProperty(group)) {
+        const permissions = AUTH_ROLES[group];
+        for (const key in permissions) {
+          if (permissions.hasOwnProperty(key)) {
+            permissionsArray.push({
+              name: key,
+              description: `${group} permission for ${key.toLowerCase()}`,
+              code: key,
+              group: group,
+              status: permissions[key],
+            });
+          }
+        }
+      }
+    }
+
+    return permissionsArray;
+  }
+
+  async getListPermissions(): Promise<PermissionDocument[]> {
+    const permissions = await this.permissionRepository.getListPermissions();
+    return permissions;
   }
 
   async getPermissionDetail(permissionId: string): Promise<PermissionDocument> {
@@ -37,7 +55,7 @@ export class PermissionService {
 
   async updatePermission(
     permissionId: string,
-    request: CreateAndUpdatePermissionRequest
+    request: UpdateStatusPermissionRequest
   ): Promise<PermissionDocument> {
     const currentPermission = await this.permissionRepository.findById(
       permissionId
@@ -45,7 +63,8 @@ export class PermissionService {
 
     const newVersion = this.incrementVersion(currentPermission.version);
     const updatedRequest = {
-      ...request,
+      ...currentPermission,
+      status: request.status,
       version: newVersion,
     };
     return this.permissionRepository.update(permissionId, updatedRequest);

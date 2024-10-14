@@ -1,5 +1,13 @@
-import { IsArray, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from "class-validator";
+import { Type } from "class-transformer";
+import { Status } from "src/enums/role.enum";
 
 export class CreateAndUpdateRoleRequest {
   @IsString()
@@ -11,16 +19,19 @@ export class CreateAndUpdateRoleRequest {
 
   @IsArray()
   permissions: string[];
+
+  @IsEnum(Status)
+  status: Status;
 }
 
 export class GetListRoleCommonRequest {
   @Type(() => Number)
   @IsInt()
-  @Min(1)
+  @Min(0)
   page: number;
 
   @Type(() => Number)
   @IsInt()
-  @Min(1)
+  @Min(5)
   limit: number;
 }
