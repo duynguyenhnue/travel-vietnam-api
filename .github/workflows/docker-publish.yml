@@ -4,8 +4,6 @@ on:
   push:
     branches: ["master"] # Khi có đẩy lên nhánh master
     tags: ["v*.*.*"] # Khi có nhãn theo định dạng semver
-  pull_request:
-    branches: ["master"] # Khi có pull request tới nhánh master
 
 env:
   REGISTRY: docker.io
