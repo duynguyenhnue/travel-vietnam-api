@@ -4,14 +4,15 @@ import { successResponse } from "src/common/dto/response.dto";
 import { CommonException } from "src/common/exception/common.exception";
 import { CreateBookingRequest } from "src/payload/request/booking.request";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
-import { SkipAuth } from "src/config/skip.auth";
+import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
+import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 
 @Controller("bookings")
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Post()
-  @SkipAuth()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.BOOKING_CREATE)
   async createBooking(@Body() createBookingDto: CreateBookingRequest) {
     try {
       const savedBooking = await this.bookingService.createBooking(
@@ -27,6 +28,7 @@ export class BookingController {
   }
 
   @Post()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.BOOKING_CANCEL)
   async cancelBooking(@Param("id", ParseObjectIdPipe) id: string) {
     try {
       await this.bookingService.cancelBooking(id);
@@ -40,6 +42,7 @@ export class BookingController {
   }
 
   @Get(":id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.BOOKING_VIEW)
   async getBooking(@Param("id", ParseObjectIdPipe) id: string) {
     try {
       const booking = await this.bookingService.getBookingById(id);
@@ -52,7 +55,6 @@ export class BookingController {
     }
   }
 
-  @SkipAuth()
   @Get()
   async getAllBookings() {
     try {
