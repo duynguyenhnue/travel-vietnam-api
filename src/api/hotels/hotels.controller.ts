@@ -17,9 +17,7 @@ import {
   UpdateHotelRequestDto,
   searchHotelIdRequestDto,
 } from "src/payload/request/hotels.request";
-import { HotelResponseDto } from "src/payload/response/hotels.response";
 import { SkipAuth } from "src/config/skip.auth";
-import { FileUploadInterceptor } from "../firebase/file.interceptor";
 import { CommonException } from "src/common/exception/common.exception";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { ObjectId } from "mongoose";

@@ -17,7 +17,6 @@ import {
   SearchRoomRequestDto,
   UpdateRoomRequestDto,
 } from "src/payload/request/rooms.request";
-import { RoomResponseDto } from "src/payload/response/room.response";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { SkipAuth } from "src/config/skip.auth";
 import { ObjectId } from "mongoose";

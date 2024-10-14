@@ -17,7 +17,6 @@ import { successResponse } from "src/common/dto/response.dto";
 import { CommonException } from "src/common/exception/common.exception";
 import {
   CreateTourDto,
-  GetTourRequestDto,
   SearchTourRequestDto,
   UpdateTourDto,
 } from "src/payload/request/tour.request";
