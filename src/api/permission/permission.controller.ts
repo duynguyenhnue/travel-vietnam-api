@@ -15,38 +15,23 @@ import { CommonException } from "../../common/exception/common.exception";
 import { successResponse } from "../../common/dto/response.dto";
 import { PermissionService } from "./permission.service";
 import {
-  CreateAndUpdatePermissionRequest,
   GetListPermissionCommonRequest,
+  UpdateStatusPermissionRequest,
 } from "../../payload/request/permission.request";
 import { SkipAuth } from "../../config/skip.auth";
+import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
+import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 
-@Controller("permission")
+@Controller("permissions")
 @UseFilters(CommonExceptionFilter)
 export class PermissionController {
   constructor(private readonly service: PermissionService) {}
 
-  @Post("create")
-  @SkipAuth()
-  async createPermission(@Body() request: CreateAndUpdatePermissionRequest) {
+  @Get()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.PERMISSION_VIEW)
+  async getListPermissions() {
     try {
-      const permission = await this.service.createPermission(request);
-      return successResponse(permission);
-    } catch (error) {
-      throw new CommonException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  @Get("list")
-  @SkipAuth()
-  async getListPermissions(@Query() query: GetListPermissionCommonRequest) {
-    try {
-      const permissions = await this.service.getListPermissions(
-        query.page,
-        query.limit
-      );
+      const permissions = await this.service.getListPermissions();
       return successResponse(permissions);
     } catch (error) {
       throw new CommonException(
@@ -56,8 +41,8 @@ export class PermissionController {
     }
   }
 
-  @Get(":permissionId")
-  @SkipAuth()
+  @Get("get/:permissionId")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.PERMISSION_VIEW)
   async getPermissionDetail(@Param("permissionId") permissionId: string) {
     try {
       const permission = await this.service.getPermissionDetail(permissionId);
@@ -71,29 +56,16 @@ export class PermissionController {
   }
 
   @Put("update/:permissionId")
-  @SkipAuth()
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.PERMISSION_UPDATE)
   async updatePermission(
     @Param("permissionId") permissionId: string,
-    @Body() request: CreateAndUpdatePermissionRequest
+    @Body() request: UpdateStatusPermissionRequest
   ) {
     try {
       const permission = await this.service.updatePermission(
         permissionId,
         request
       );
-      return successResponse(permission);
-    } catch (error) {
-      throw new CommonException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  @Delete("delete/:permissionId")
-  async deletePermission(@Param("permissionId") permissionId: string) {
-    try {
-      const permission = await this.service.deletePermission(permissionId);
       return successResponse(permission);
     } catch (error) {
       throw new CommonException(

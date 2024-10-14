@@ -40,7 +40,7 @@ export class AuthJwtRoleGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
 
-    const role: Role = await this.roleRepository.findById(user.role);
+    const role: Role = await this.roleRepository.findByRoleName(user.role);
 
     const permissionIds: string[] = role.permissions;
 
@@ -69,7 +69,7 @@ export function AuthJwtAccessProtected(
   ...permissions: AUTH_PERMISSIONS[]
 ): MethodDecorator {
   return applyDecorators(
-    UseGuards(JwtAuthGuard, AuthJwtRoleGuard),
+    UseGuards(AuthJwtRoleGuard),
     SetMetadata(AUTH_PERMISSION_META_KEY, permissions)
   );
 }

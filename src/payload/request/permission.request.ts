@@ -3,20 +3,7 @@ import { Type } from "class-transformer";
 import { GroupPermission, Status } from "../../enums/permission.enum";
 import { AUTH_PERMISSIONS } from "../../enums/auth.enum";
 
-export class CreateAndUpdatePermissionRequest {
-  @IsString()
-  name: string;
-
-  @IsString()
-  @IsOptional()
-  description: string;
-
-  @IsEnum(AUTH_PERMISSIONS)
-  code: AUTH_PERMISSIONS;
-
-  @IsEnum(GroupPermission)
-  group: GroupPermission;
-
+export class UpdateStatusPermissionRequest {
   @IsEnum(Status)
   status: Status;
 }
@@ -24,7 +11,7 @@ export class CreateAndUpdatePermissionRequest {
 export class GetListPermissionCommonRequest {
   @Type(() => Number)
   @IsInt()
-  @Min(1)
+  @Min(0)
   page: number;
 
   @Type(() => Number)

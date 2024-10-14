@@ -21,6 +21,36 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
+  async onModuleInit() {
+    await this.createDefaultUser();
+  }
+
+  async createDefaultUser(): Promise<User> {
+    const defaultUser = {
+      email: "admin@travel.com",
+      fullName: "Admin",
+      password: await bcrypt.hash("Admin123", 10),
+      dateOfBirth: null,
+      address: null,
+      phone: null,
+      role: "ADMIN",
+    };
+
+    const existingUser = await this.userModel
+      .findOneAndUpdate({ email: defaultUser.email }, defaultUser, {
+        upsert: true,
+        new: true,
+      })
+      .exec();
+
+    if (existingUser) {
+      return existingUser;
+    }
+
+    const newUser = new this.userModel(defaultUser);
+    return await newUser.save();
+  }
+
   async login(loginUserRequest: any): Promise<User> {
     const user = await this.userModel
       .findOne({ email: loginUserRequest.email })

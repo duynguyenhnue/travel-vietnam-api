@@ -21,12 +21,12 @@ import {
 } from "../../payload/request/role.request";
 import { successResponse } from "../../common/dto/response.dto";
 
-@Controller("role")
+@Controller("roles")
 @UseFilters(CommonExceptionFilter)
 export class RoleController {
   constructor(private readonly service: RoleService) {}
 
-  @Post("create")
+  @Post()
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROLE_CREATE)
   async createRole(@Body() request: CreateAndUpdateRoleRequest) {
     try {
@@ -40,7 +40,7 @@ export class RoleController {
     }
   }
 
-  @Get("list")
+  @Get("search")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROLE_VIEW)
   async getListRoles(@Query() query: GetListRoleCommonRequest) {
     try {
@@ -54,7 +54,7 @@ export class RoleController {
     }
   }
 
-  @Get(":roleId")
+  @Get("get/:roleId")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROLE_VIEW)
   async getRoleDetail(@Param("roleId") roleId: string) {
     try {
@@ -68,7 +68,7 @@ export class RoleController {
     }
   }
 
-  @Put("update/:roleId")
+  @Put(":roleId")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROLE_UPDATE)
   async updateRole(
     @Param("roleId") roleId: string,
@@ -85,7 +85,23 @@ export class RoleController {
     }
   }
 
-  @Delete("delete/:roleId")
+  @Post("/permissions")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.PERMISSION_VIEW)
+  async getPermissionRoles(@Body() request: { role: string }) {
+    try {
+      const permissions = await this.service.getListPermissionRole(
+        request.role
+      );
+      return successResponse(permissions);
+    } catch (error) {
+      throw new CommonException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Delete(":roleId")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROLE_DELETE)
   async deleteRole(@Param("roleId") roleId: string) {
     try {

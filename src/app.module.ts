@@ -11,10 +11,11 @@ import { ConfigModule } from "@nestjs/config";
 import { HotelsModule } from "./api/hotels/hotels.module";
 import { RoomsModule } from "./api/rooms/rooms.module";
 import { FirebaseModule } from "./api/firebase/firebase.module";
-import { TourModule } from './api/tour/tour.module';
-import { ReviewModule } from './api/review/review.module';
-import { BookingModule } from './api/booking/booking.module';
-import { NotificationModule } from './notification/notification.module';
+import { TourModule } from "./api/tour/tour.module";
+import { ReviewModule } from "./api/review/review.module";
+import { BookingModule } from "./api/booking/booking.module";
+import { NotificationModule } from "./api/notification/notification.module";
+import { HistoryModule } from "./api/history/history.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { NotificationModule } from './notification/notification.module';
     ReviewModule,
     BookingModule,
     NotificationModule,
+    HistoryModule,
   ],
   controllers: [],
   providers: [

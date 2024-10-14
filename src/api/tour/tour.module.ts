@@ -6,8 +6,7 @@ import { Tour, TourSchema } from "src/schema/tour.schema";
 import { FirebaseModule } from "../firebase/firebase.module";
 import { HotelsModule } from "../hotels/hotels.module";
 import { ReviewModule } from "../review/review.module";
-import { NotificationModule } from "src/notification/notification.module";
-
+import { NotificationModule } from "src/api/notification/notification.module";
 
 @Module({
   imports: [
