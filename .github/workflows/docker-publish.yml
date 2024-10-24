@@ -97,6 +97,10 @@ jobs:
             -e DATABASE_MONGO_SRC="mongodb+srv://stu715105064:ZeClf5THTVJyp5Jr@cluster0.yyq3k.mongodb.net/travel-social" \
             -e WEBSOCKET_URL=http://139.59.107.77:8888 \
             -e PORT=8080 \
+            -e VNPAY_TMN_CODE=V65MNMN3 \
+            -e VNPAY_HASH_SECRET=32CFKSOQ7R4EISE9944JRCAHPDCXXA7J \
+            -e VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html \
+            -e VNPAY_RETURN_URL=https://api.travel-vietnamese.me/vnpay/vnpay_return \
             --name travel_backend_container duynguyenhnue/travel-vietnam-api:latest
           EOF
 
