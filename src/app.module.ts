@@ -21,6 +21,7 @@ import { ReviewModule } from "./api/review/review.module";
 import { BookingModule } from "./api/booking/booking.module";
 import { NotificationModule } from "./api/notification/notification.module";
 import { HistoryModule } from "./api/history/history.module";
+import { VnpayModule } from "./api/vnpay/vnpay.module";
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { HistoryModule } from "./api/history/history.module";
     BookingModule,
     NotificationModule,
     HistoryModule,
+    VnpayModule,
   ],
   controllers: [],
   providers: [
