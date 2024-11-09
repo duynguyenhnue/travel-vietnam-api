@@ -39,15 +39,11 @@ export class AuthService {
     }
     return null;
   }
-
+ 
   async login(authRequest: AuthRequest): Promise<any> {
     const user = await this.validateUser(authRequest);
 
     if (!user) {
-      throw new CommonException("Unauthorized", HttpStatus.UNAUTHORIZED);
-    }
-
-    if (user.role === "USER") {
       throw new CommonException("Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
