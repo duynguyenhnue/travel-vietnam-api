@@ -38,6 +38,19 @@ export class UserController {
     }
   }
 
+  @Get("find/:id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.CUSTOMER_VIEW)
+  async findUser(@Param("id") id: string) {
+    try {
+      return successResponse(await this.userService.findUser(id));
+    } catch (error) {
+      throw new CommonException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Get("search")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.CUSTOMER_VIEW)
   async search(@Query() query: SearchUserRequest) {
