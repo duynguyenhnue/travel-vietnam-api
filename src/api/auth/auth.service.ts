@@ -39,7 +39,7 @@ export class AuthService {
     }
     return null;
   }
-
+ 
   async login(authRequest: AuthRequest): Promise<any> {
     const user = await this.validateUser(authRequest);
 
