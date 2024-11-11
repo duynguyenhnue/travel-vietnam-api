@@ -18,5 +18,6 @@ import { PermissionModule } from "../permission/permission.module";
   ],
   providers: [BookingService],
   controllers: [BookingController],
+  exports: [BookingService, MongooseModule],
 })
 export class BookingModule {}

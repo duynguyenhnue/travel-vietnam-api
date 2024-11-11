@@ -10,7 +10,13 @@ export class Booking {
   userId: string;
 
   @Prop({ required: true })
-  tourId: string;
+  orderId: string;
+
+  @Prop({ required: true })
+  amount: number;
+
+  @Prop({ required: true })
+  vnpayCode: string;
 
   @Prop({ required: true })
   status: BookingStatus;
