@@ -67,9 +67,6 @@ export class BookingService {
     if (!booking) {
       throw new NotFoundException("Booking not found");
     }
-    if (booking.status === BookingStatus.CONFIRMED) {
-      throw new CommonException("Booking has been confirmed", HttpStatus.OK);
-    }
     booking.status = status;
 
     await this.bookingModel.findByIdAndUpdate(booking._id, booking, {
