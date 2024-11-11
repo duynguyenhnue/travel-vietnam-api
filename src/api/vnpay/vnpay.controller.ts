@@ -54,7 +54,6 @@ export class VnpayController {
   }
 
   @Get("vnpay_return")
-  @SkipAuth()
   async vnpayReturn(@Query() query: any) {
     try {
       const isValid = await this.vnpayService.verifyReturn(query);
@@ -77,7 +76,7 @@ export class VnpayController {
           status: BookingStatus.CANCELLED,
           amount: query.vnp_Amount / 100,
           txnRef: query.vnp_TxnRef,
-          message: "Invalid secure hash",
+          message: "Order has been cancelled",
         });
       }
     } catch (error) {
