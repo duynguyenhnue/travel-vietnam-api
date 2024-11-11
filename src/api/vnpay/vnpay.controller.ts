@@ -58,12 +58,11 @@ export class VnpayController {
     try {
       const isValid = await this.vnpayService.verifyReturn(query);
 
-      const typeBooking = await this.vnpayService.getTypeBooking(
-        query.vnp_TxnRef,
-        BookingStatus.CONFIRMED
-      );
-
       if (isValid) {
+        const typeBooking = await this.vnpayService.getTypeBooking(
+          query.vnp_TxnRef,
+          BookingStatus.CONFIRMED
+        );
         return successResponse({
           status: BookingStatus.CONFIRMED,
           bookingType: typeBooking,
@@ -76,7 +75,7 @@ export class VnpayController {
           status: BookingStatus.CANCELLED,
           amount: query.vnp_Amount / 100,
           txnRef: query.vnp_TxnRef,
-          message: "Order has been cancelled",
+          message: "Your order has been canceled or an error occurred.",
         });
       }
     } catch (error) {
