@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { CreateBookingRequest } from "src/payload/request/booking.request";
@@ -7,6 +7,7 @@ import { TourService } from "../tour/tour.service";
 import { UserService } from "../users/users.service";
 import { BookingStatus, BookingType } from "src/enums/booking.enum";
 import { Tour, TourDocument } from "src/schema/tour.schema";
+import { CommonException } from "src/common/exception/common.exception";
 
 @Injectable()
 export class BookingService {
@@ -65,6 +66,9 @@ export class BookingService {
     const booking = await this.bookingModel.findOne({ vnpayCode: code }).exec();
     if (!booking) {
       throw new NotFoundException("Booking not found");
+    }
+    if (booking.status === BookingStatus.CONFIRMED) {
+      throw new CommonException("Booking has been confirmed", HttpStatus.OK);
     }
     booking.status = status;
 

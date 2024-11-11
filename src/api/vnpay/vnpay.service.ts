@@ -84,9 +84,6 @@ export class VnpayService {
     let secureHash = vnpParams.vnp_SecureHash;
     const secretKey = process.env.VNPAY_HASH_SECRET;
 
-    delete vnpParams.vnp_SecureHash;
-    delete vnpParams.vnp_SecureHashType;
-
     vnpParams = await this.sortObject(vnpParams);
 
     let signData = qs.stringify(vnpParams, { encode: false });
