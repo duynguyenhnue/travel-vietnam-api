@@ -2,12 +2,30 @@ import { Injectable } from "@nestjs/common";
 import * as crypto from "crypto";
 import moment from "moment";
 import * as qs from "qs";
+import { BookingService } from "../booking/booking.service";
+import { BookingType } from "src/enums/booking.enum";
 
 @Injectable()
 export class VnpayService {
+  constructor(private readonly bookingService: BookingService) {}
+  private tmnCode = process.env.VNPAY_TMN_CODE;
+  private secretKey = process.env.VNPAY_HASH_SECRET;
+  private vnpUrl = process.env.VNPAY_URL;
+  private returnUrl = process.env.VNPAY_RETURN_URL;
+
+  async getTypeBooking(code, status) {
+    return (await this.bookingService.getBookingByCode(code, status))
+      .bookingType;
+  }
+
   async createPaymentUrl(
-    body: { amount: number },
-    ipAddr: string
+    body: {
+      amount: number;
+      bookingType: BookingType;
+      guestSize: number;
+      orderId: string;
+    },
+    userId: string
   ): Promise<string> {
     try {
       // Đặt múi giờ
@@ -15,10 +33,6 @@ export class VnpayService {
 
       const date = new Date();
       const createDate = moment(date).format("YYYYMMDDHHmmss");
-      const tmnCode = process.env.VNPAY_TMN_CODE;
-      const secretKey = process.env.VNPAY_HASH_SECRET;
-      const vnpUrl = process.env.VNPAY_URL;
-      const returnUrl = process.env.VNPAY_RETURN_URL;
       const orderId = moment(date).format("DDHHmmss");
       const amount = body.amount;
 
@@ -30,14 +44,14 @@ export class VnpayService {
       let vnp_Params: any = {
         vnp_Version: "2.1.0",
         vnp_Command: "pay",
-        vnp_TmnCode: tmnCode,
+        vnp_TmnCode: this.tmnCode,
         vnp_Locale: "vn",
         vnp_CurrCode: "VND",
         vnp_TxnRef: orderId,
         vnp_OrderInfo: `Thanh toan cho ma GD:${orderId}. So tien ${amount} VND`,
         vnp_OrderType: "other",
         vnp_Amount: amount * 100,
-        vnp_ReturnUrl: returnUrl,
+        vnp_ReturnUrl: this.returnUrl,
         vnp_IpAddr: "127.0.0.1",
         vnp_CreateDate: createDate,
       };
@@ -46,11 +60,20 @@ export class VnpayService {
       vnp_Params = await this.sortObject(vnp_Params);
 
       const signData = qs.stringify(vnp_Params, { encode: false });
-      const hmac = crypto.createHmac("sha512", secretKey);
+      const hmac = crypto.createHmac("sha512", this.secretKey);
       const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
       vnp_Params["vnp_SecureHash"] = signed;
 
-      return `${vnpUrl}?${qs.stringify(vnp_Params, { encode: false })}`;
+      await this.bookingService.createBooking({
+        amount,
+        userId: userId,
+        orderId: body.orderId,
+        vnpayCode: orderId,
+        guestSize: body.guestSize,
+        bookingType: body.bookingType,
+      });
+
+      return `${this.vnpUrl}?${qs.stringify(vnp_Params, { encode: false })}`;
     } catch (error) {
       console.error("Error in createPaymentUrl:", error.message);
       throw new Error("Failed to create payment URL");

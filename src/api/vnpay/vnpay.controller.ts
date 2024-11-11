@@ -12,20 +12,30 @@ import { VnpayService } from "./vnpay.service";
 import { SkipAuth } from "src/config/skip.auth";
 import { successResponse } from "src/common/dto/response.dto";
 import { CommonException } from "src/common/exception/common.exception";
+import { BookingService } from "../booking/booking.service";
+import { BookingStatus, BookingType } from "src/enums/booking.enum";
 
 @Controller("vnpay")
 export class VnpayController {
   constructor(private readonly vnpayService: VnpayService) {}
 
   @Post("create_payment_url")
-  @SkipAuth()
   async createPaymentUrl(
-    @Body() body: { amount: number },
-    @Req() req: Request
+    @Body()
+    body: {
+      amount: number;
+      bookingType: BookingType;
+      guestSize: number;
+      orderId: string;
+    },
+    @Req() req
   ) {
     try {
       const ipAddr = this.getClientIpAddress(req);
-      const paymentUrl = await this.vnpayService.createPaymentUrl(body, ipAddr);
+      const paymentUrl = await this.vnpayService.createPaymentUrl(
+        body,
+        req.user._id
+      );
 
       return successResponse({ paymentUrl });
     } catch (error) {
@@ -49,14 +59,32 @@ export class VnpayController {
     try {
       const isValid = await this.vnpayService.verifyReturn(query);
 
-      return successResponse({
-        status: "success",
-        txnRef: query.vnp_TxnRef,
-        responseCode: query.vnp_ResponseCode,
-      });
+      const typeBooking = await this.vnpayService.getTypeBooking(
+        query.vnp_TxnRef,
+        BookingStatus.CONFIRMED
+      );
+
+      if (isValid) {
+        return successResponse({
+          status: BookingStatus.CONFIRMED,
+          bookingType: typeBooking,
+          amount: query.vnp_Amount / 100,
+          txnRef: query.vnp_TxnRef,
+          responseCode: query.vnp_ResponseCode,
+        });
+      } else {
+        return successResponse({
+          status: BookingStatus.CANCELLED,
+          amount: query.vnp_Amount / 100,
+          txnRef: query.vnp_TxnRef,
+          message: "Invalid secure hash",
+        });
+      }
     } catch (error) {
       return successResponse({
-        status: "fail",
+        status: "ERROR",
+        amount: query.vnp_Amount / 100,
+        txnRef: query.vnp_TxnRef,
         message: "Invalid secure hash",
       });
     }
