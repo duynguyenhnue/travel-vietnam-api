@@ -75,7 +75,11 @@ export class VnpayController {
           status: BookingStatus.CANCELLED,
           amount: query.vnp_Amount / 100,
           txnRef: query.vnp_TxnRef,
+<<<<<<< HEAD
           message: "Your order has been canceled or an error occurred.",
+=======
+          message: "Order has been cancelled",
+>>>>>>> 9e3a3e364218252baffc39ed7fb1b1a902f83bf2
         });
       }
     } catch (error) {

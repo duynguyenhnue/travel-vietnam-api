@@ -67,7 +67,6 @@ export class BookingService {
     if (!booking) {
       throw new NotFoundException("Booking not found");
     }
-
     booking.status = status;
 
     await this.bookingModel.findByIdAndUpdate(booking._id, booking, {
