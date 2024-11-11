@@ -14,8 +14,6 @@ export class VnpayService {
   private returnUrl = process.env.VNPAY_RETURN_URL;
 
   async getTypeBooking(code, status) {
-    console.log(1234);
-
     return (await this.bookingService.getBookingByCode(code, status))
       .bookingType;
   }

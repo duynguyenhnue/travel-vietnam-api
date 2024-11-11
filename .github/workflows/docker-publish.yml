@@ -100,7 +100,7 @@ jobs:
             -e VNPAY_TMN_CODE=V65MNMN3 \
             -e VNPAY_HASH_SECRET=32CFKSOQ7R4EISE9944JRCAHPDCXXA7J \
             -e VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html \
-            -e VNPAY_RETURN_URL=https://api.travel-vietnamese.me/vnpay/vnpay_return \
+            -e VNPAY_RETURN_URL=https://travel-vietnamese.me/vnpay/vnpay_return \
             --name travel_backend_container duynguyenhnue/travel-vietnam-api:latest
           EOF
 
