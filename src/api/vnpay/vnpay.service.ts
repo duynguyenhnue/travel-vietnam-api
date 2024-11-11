@@ -83,6 +83,7 @@ export class VnpayService {
   async verifyReturn(vnpParams: any): Promise<boolean> {
     let secureHash = vnpParams.vnp_SecureHash;
     const secretKey = process.env.VNPAY_HASH_SECRET;
+
     if (vnpParams.vnp_BankCode === "VNPAY") {
       return false;
     }
