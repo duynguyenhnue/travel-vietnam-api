@@ -83,14 +83,11 @@ export class VnpayService {
   async verifyReturn(vnpParams: any): Promise<boolean> {
     let secureHash = vnpParams.vnp_SecureHash;
     const secretKey = process.env.VNPAY_HASH_SECRET;
-<<<<<<< HEAD
     if (vnpParams.vnp_BankCode === "VNPAY") {
       return false;
     }
     delete vnpParams.vnp_SecureHash;
     delete vnpParams.vnp_SecureHashType;
-=======
->>>>>>> 9e3a3e364218252baffc39ed7fb1b1a902f83bf2
 
     vnpParams = await this.sortObject(vnpParams);
 
