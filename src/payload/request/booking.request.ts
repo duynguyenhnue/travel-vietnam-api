@@ -8,7 +8,15 @@ export class CreateBookingRequest {
 
   @IsString()
   @IsNotEmpty()
-  tourId: string;
+  orderId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  vnpayCode: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
 
   @IsEnum(BookingType)
   bookingType: BookingType;

@@ -6,6 +6,7 @@ import { CreateBookingRequest } from "src/payload/request/booking.request";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
 import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
 import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
+import { SkipAuth } from "src/config/skip.auth";
 
 @Controller("bookings")
 export class BookingController {
@@ -56,6 +57,7 @@ export class BookingController {
   }
 
   @Get()
+  @SkipAuth()
   async getAllBookings() {
     try {
       const bookings = await this.bookingService.getAllBookings();
