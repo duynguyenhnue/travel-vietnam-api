@@ -5,8 +5,8 @@ import { plainToInstance } from "class-transformer";
 import { Hotel } from "src/schema/hotel.schema";
 import {
   CreateHotelRequestDto,
+  SearchHotelsRequestDto,
   UpdateHotelRequestDto,
-  searchHotelIdRequestDto,
 } from "src/payload/request/hotels.request";
 import { HotelResponseDto } from "src/payload/response/hotels.response";
 import { FirebaseService } from "../firebase/firebase.service";
@@ -39,34 +39,52 @@ export class HotelsService {
     const savedHotel = await createdHotel.save();
     return plainToInstance(HotelResponseDto, savedHotel.toObject());
   }
-
-  async searchHotel(
-    query: searchHotelIdRequestDto
+  
+  async getHotelBySearch(
+    query: SearchHotelsRequestDto
   ): Promise<{ data: HotelResponseDto[]; total: number }> {
-    const { limit = 6, page = 0, search } = query;
+    const { name, maxGroupSize, limit, page, price, status } = query;
     const offset = page * limit;
 
-    const filter: any = {};
-    if (search) {
-      filter.name = { $regex: search, $options: "i" };
+    const filter: any = {
+    };
+  
+    if (name && name.trim() !== "") {
+      filter.name = new RegExp(name, "i");
+    }
+  
+    if (maxGroupSize && !isNaN(Number(maxGroupSize))) {
+      filter.maxGroupSize = { $gte: parseInt(maxGroupSize.toString(), 10) };
+    }
+    
+    if (price && !isNaN(Number(price))) {
+      filter.price = { $lte: parseInt(price.toString(), 10) };
     }
 
-    const data = await this.hotelModel
+    if (status && status.trim() !== "") {
+      filter.status = status;
+    }
+
+    const hotels = await this.hotelModel
       .find(filter)
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
       .exec();
+    
+    console.log(hotels);
+
+    const hotelsMap: HotelResponseDto[] = await Promise.all(
+      hotels.map(async (hotel) => {
+        return { ...hotel.toObject() };  
+      })
+    );
 
     const total = await this.hotelModel.countDocuments(filter).exec();
 
-    return {
-      data: data.map((hotel) =>
-        plainToInstance(HotelResponseDto, hotel.toObject())
-      ),
-      total,
-    };
+    return { data: hotelsMap, total };
   }
+  
 
   async findOne(id: ObjectId): Promise<HotelResponseDto> {
     const hotel = await this.hotelModel.findById(id).exec();
