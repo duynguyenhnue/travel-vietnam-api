@@ -71,8 +71,6 @@ export class HotelsService {
       .skip(offset)
       .limit(limit)
       .exec();
-    
-    console.log(hotels);
 
     const hotelsMap: HotelResponseDto[] = await Promise.all(
       hotels.map(async (hotel) => {

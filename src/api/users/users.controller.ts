@@ -14,6 +14,7 @@ import {
 import { UserService } from "./users.service";
 import { User } from "../../schema/user.schema";
 import {
+  ChangePasswordRequest,
   SearchUserRequest,
   UpdateUserRequest,
 } from "../../payload/request/users.request";
@@ -95,5 +96,11 @@ export class UserController {
       }
       throw new InternalServerErrorException("Failed to delete user");
     }
+  }
+
+  @Put("change-password/:id")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.CUSTOMER_UPDATE)
+  async changePassword(@Param("id") id: string, @Body() changePasswordRequest: ChangePasswordRequest) {
+    return this.userService.changePassword(id, changePasswordRequest.oldPassword, changePasswordRequest.newPassword);
   }
 }
