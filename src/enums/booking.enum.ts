@@ -17,3 +17,11 @@ export enum TourStatus {
   CANCELLED = "CANCELLED",
   DELETED = "DELETED",
 }
+
+export enum HotelStatus {
+  PENDING = "PENDING",
+  INPROGRESS = "INPROGRESS",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  DELETED = "DELETED",
+}

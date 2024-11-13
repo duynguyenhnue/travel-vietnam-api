@@ -3,17 +3,25 @@ import { Type } from "class-transformer";
 import {
   IsString,
   IsArray,
-  IsNumber,
   IsOptional,
-  IS_LENGTH,
-  Length,
   Matches,
   Min,
-  IsInt,
   IsNotEmpty,
   ValidateNested,
+  IsDateString,
 } from "class-validator";
 import { Address } from "./users.request";
+import { HotelStatus } from "src/enums/booking.enum";
+
+export class GetHotelRequestDto {
+  @Type(() => Number)
+  @Min(0)
+  limit: number;
+
+  @Type(() => Number)
+  @Min(0)
+  page: number;
+}
 
 export class CreateHotelRequestDto {
   @IsString()
@@ -34,6 +42,14 @@ export class CreateHotelRequestDto {
   @Matches(/^\d+$/, { message: "Price must be a numeric string." })
   @IsString()
   price: number;
+
+  @IsNotEmpty()
+  @IsDateString()
+  startDate: Date;
+
+  @IsNotEmpty()
+  @IsDateString()
+  endDate: Date;
 }
 
 export class UpdateHotelRequestDto extends PartialType(CreateHotelRequestDto) {
@@ -54,4 +70,19 @@ export class searchHotelIdRequestDto {
   @Type(() => Number)
   @Min(0)
   page: number;
+}
+
+export class SearchHotelsRequestDto extends GetHotelRequestDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsOptional()
+  maxGroupSize?: number;
+
+  @IsOptional()
+  price?: number;
+
+  @IsOptional()
+  status?: HotelStatus;
 }

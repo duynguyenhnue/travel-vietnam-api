@@ -14,6 +14,7 @@ import {
 import { HotelsService } from "./hotels.service";
 import {
   CreateHotelRequestDto,
+  SearchHotelsRequestDto,
   UpdateHotelRequestDto,
   searchHotelIdRequestDto,
 } from "src/payload/request/hotels.request";
@@ -50,8 +51,8 @@ export class HotelsController {
 
   @Get("/search")
   @SkipAuth()
-  async searchHotel(@Query() query: searchHotelIdRequestDto) {
-    return successResponse(await this.hotelsService.searchHotel(query));
+  async searchHotel(@Query() query: SearchHotelsRequestDto) {
+    return successResponse(await this.hotelsService.getHotelBySearch(query));
   }
 
   @Get(":id")

@@ -16,4 +16,8 @@ export class HotelResponseDto {
   amenities: string[];
 
   photos: string[];
+
+  startDate: Date;
+
+  endDate: Date;
 }

@@ -24,6 +24,12 @@ export class Hotel extends Document {
 
   @Prop([String])
   photos: string[];
+
+  @Prop({ required: true })
+  startDate: Date;
+
+  @Prop({ required: true })
+  endDate: Date;
 }
 
 export const HotelSchema = SchemaFactory.createForClass(Hotel);
