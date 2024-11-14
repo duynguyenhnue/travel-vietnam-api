@@ -95,7 +95,7 @@ jobs:
             -e JWT_SECRET="travel-vietnam" \
             -e JWT_REFRESH_SECRET="travel-vietnam-refresh" \
             -e DATABASE_MONGO_SRC="mongodb+srv://stu715105064:ZeClf5THTVJyp5Jr@cluster0.yyq3k.mongodb.net/travel-social" \
-            -e WEBSOCKET_URL=http://139.59.107.77:8888 \
+            -e WEBSOCKET_URL="https://socket.travel-vietnamese.me" \
             -e PORT=8080 \
             -e VNPAY_TMN_CODE=V65MNMN3 \
             -e VNPAY_HASH_SECRET=32CFKSOQ7R4EISE9944JRCAHPDCXXA7J \
