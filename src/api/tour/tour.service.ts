@@ -138,14 +138,22 @@ export class TourService {
   async getTourBySearch(
     query: SearchTourRequestDto
   ): Promise<{ data: TourResponse[]; total: number }> {
-    const { title, groupSize, limit, page } = query;
+    const { name, departurePoint, destination, groupSize, limit, page } = query;
     const offset = page * limit;
     const filter: any = {
       isDeleted: false,
     };
 
-    if (title) {
-      filter.title = new RegExp(title, "i");
+    if (name) {
+      filter.title = new RegExp(name, "i");
+    }
+
+    if (departurePoint) {
+      filter["departurePoint.province"] = departurePoint;
+    }
+
+    if (destination) {
+      filter["destination.province"] = destination;
     }
     if (groupSize) {
       filter.maxGroupSize = { $gte: groupSize };

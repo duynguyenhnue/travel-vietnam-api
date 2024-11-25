@@ -77,6 +77,10 @@ export class SearchHotelsRequestDto extends GetHotelRequestDto {
   @IsOptional()
   name?: string;
 
+  @IsString()
+  @IsOptional()
+  city?: string;
+
   @IsOptional()
   maxGroupSize?: number;
 

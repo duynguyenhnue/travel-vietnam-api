@@ -39,24 +39,27 @@ export class HotelsService {
     const savedHotel = await createdHotel.save();
     return plainToInstance(HotelResponseDto, savedHotel.toObject());
   }
-  
+
   async getHotelBySearch(
     query: SearchHotelsRequestDto
   ): Promise<{ data: HotelResponseDto[]; total: number }> {
-    const { name, maxGroupSize, limit, page, price, status } = query;
+    const { name, maxGroupSize, limit, page, price, status, city } = query;
     const offset = page * limit;
 
-    const filter: any = {
-    };
-  
+    const filter: any = {};
+
     if (name && name.trim() !== "") {
       filter.name = new RegExp(name, "i");
     }
-  
+
+    if (city && city.trim() !== "") {
+      filter["address.province"] = city;
+    }
+
     if (maxGroupSize && !isNaN(Number(maxGroupSize))) {
       filter.maxGroupSize = { $gte: parseInt(maxGroupSize.toString(), 10) };
     }
-    
+
     if (price && !isNaN(Number(price))) {
       filter.price = { $lte: parseInt(price.toString(), 10) };
     }
@@ -74,7 +77,7 @@ export class HotelsService {
 
     const hotelsMap: HotelResponseDto[] = await Promise.all(
       hotels.map(async (hotel) => {
-        return { ...hotel.toObject() };  
+        return { ...hotel.toObject() };
       })
     );
 
@@ -82,7 +85,6 @@ export class HotelsService {
 
     return { data: hotelsMap, total };
   }
-  
 
   async findOne(id: ObjectId): Promise<HotelResponseDto> {
     const hotel = await this.hotelModel.findById(id).exec();
