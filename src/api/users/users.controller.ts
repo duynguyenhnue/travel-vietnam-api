@@ -101,7 +101,6 @@ export class UserController {
   }
 
   @Post("change-password")
-  @AuthJwtAccessProtected(AUTH_PERMISSIONS.CUSTOMER_UPDATE)
   async changePassword(@Req() req, @Body() changePasswordRequest: ChangePasswordRequest) {    
     return this.userService.changePassword(req.user._id, changePasswordRequest.oldPassword, changePasswordRequest.newPassword);
   }
