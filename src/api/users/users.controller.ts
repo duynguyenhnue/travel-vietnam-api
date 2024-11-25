@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Req,
   Query,
+  Post,
 } from "@nestjs/common";
 import { UserService } from "./users.service";
 import { User } from "../../schema/user.schema";
@@ -22,6 +23,7 @@ import { CommonException } from "../../common/exception/common.exception";
 import { successResponse } from "../../common/dto/response.dto";
 import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
+import { SkipAuth } from "src/config/skip.auth";
 
 @Controller("users")
 export class UserController {
@@ -98,9 +100,9 @@ export class UserController {
     }
   }
 
-  @Put("change-password/:id")
+  @Post("change-password")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.CUSTOMER_UPDATE)
-  async changePassword(@Param("id") id: string, @Body() changePasswordRequest: ChangePasswordRequest) {
-    return this.userService.changePassword(id, changePasswordRequest.oldPassword, changePasswordRequest.newPassword);
+  async changePassword(@Req() req, @Body() changePasswordRequest: ChangePasswordRequest) {    
+    return this.userService.changePassword(req.user._id, changePasswordRequest.oldPassword, changePasswordRequest.newPassword);
   }
 }
