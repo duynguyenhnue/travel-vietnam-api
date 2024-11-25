@@ -46,7 +46,7 @@ export class RefreshTokenService {
     const payload = { email: user.email, sub: user._id };
     const access_token = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET || "JWT_SECRET",
-      expiresIn: "15m",
+      expiresIn: "7d",
     });
 
     return { access_token };
