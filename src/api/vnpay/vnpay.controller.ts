@@ -71,6 +71,11 @@ export class VnpayController {
           responseCode: query.vnp_ResponseCode,
         });
       } else {
+        await this.vnpayService.getTypeBooking(
+          query.vnp_TxnRef,
+          BookingStatus.CANCELLED
+        );
+
         return successResponse({
           status: BookingStatus.CANCELLED,
           amount: query.vnp_Amount / 100,
