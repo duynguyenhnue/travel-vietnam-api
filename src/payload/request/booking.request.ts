@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsString, IsNumber, Min, IsEnum } from "class-validator";
-import { BookingType } from "src/enums/booking.enum";
+import { Type } from "class-transformer";
+import { IsNotEmpty, IsString, IsNumber, Min, IsEnum, IsOptional } from "class-validator";
+import { BookingStatus, BookingType } from "src/enums/booking.enum";
 
 export class CreateBookingRequest {
   @IsString()
@@ -24,4 +25,23 @@ export class CreateBookingRequest {
   @IsNumber()
   @Min(1)
   guestSize: number;
+}
+
+export class GetBookingRequestDto {
+  @Type(() => Number)
+  @Min(0)
+  limit: number;
+
+  @Type(() => Number)
+  @Min(0)
+  page: number;
+}
+
+export class SearchBookingRequestDto extends GetBookingRequestDto {
+  amount?: number;
+  
+  bookingType?: BookingType;
+
+  @IsOptional()
+  status?: BookingStatus;
 }

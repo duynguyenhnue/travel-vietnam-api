@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, UploadedFiles } from "@nestjs/common";
+import { forwardRef, HttpStatus, Inject, Injectable, NotFoundException, UploadedFiles } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, ObjectId } from "mongoose";
 import { plainToInstance } from "class-transformer";
@@ -12,12 +12,16 @@ import { HotelResponseDto } from "src/payload/response/hotels.response";
 import { FirebaseService } from "../firebase/firebase.service";
 import { Folder } from "src/enums/folder.enum";
 import { CommonException } from "src/common/exception/common.exception";
+import { ReviewService } from "../review/review.service";
+import { UserService } from "../users/users.service";
+import { ReviewModule } from "../review/review.module";
+import { UserModule } from "../users/users.module";
 
 @Injectable()
 export class HotelsService {
   constructor(
     @InjectModel(Hotel.name) private hotelModel: Model<Hotel>,
-    private readonly firebaseService: FirebaseService
+    private readonly firebaseService: FirebaseService,
   ) {}
 
   async create(
@@ -86,6 +90,33 @@ export class HotelsService {
     return { data: hotelsMap, total };
   }
 
+  // async getSingleHotel(id: string): Promise<HotelResponseDto> {
+  //   const hotel = await this.hotelModel.findById(id).populate("reviews").exec();
+  //   if (!hotel) {
+  //     throw new NotFoundException("Hotel not found");
+  //   }
+
+  //   const reviews = await this.reviewService.getReviews(
+  //     hotel.reviews as unknown as string[]
+  //   );
+
+  //   const reviewsWithUserDetails = await Promise.all(
+  //     reviews.map(async (review) => {
+  //       const user = await this.userService.findUserById(review.userId);
+  //       return {
+  //         userId: review.userId,
+  //         avatar: user.avatar,
+  //         fullName: user.fullName,
+  //         rating: review.rating,
+  //         reviewText: review.reviewText,
+  //         createdAt: review.createdAt,
+  //         updatedAt: review.updatedAt,
+  //       };
+  //     })
+  //   );
+  //   return { ...hotel.toObject(), reviews: reviewsWithUserDetails };
+  // }
+
   async findOne(id: ObjectId): Promise<HotelResponseDto> {
     const hotel = await this.hotelModel.findById(id).exec();
 
@@ -125,4 +156,5 @@ export class HotelsService {
     await this.hotelModel.findByIdAndDelete(id).exec();
     return "Deleted successfully";
   }
+
 }

@@ -22,6 +22,7 @@ import { BookingModule } from "./api/booking/booking.module";
 import { NotificationModule } from "./api/notification/notification.module";
 import { HistoryModule } from "./api/history/history.module";
 import { VnpayModule } from "./api/vnpay/vnpay.module";
+import { DiscountsModule } from "./api/discounts/discounts.module";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { VnpayModule } from "./api/vnpay/vnpay.module";
     RoleModule,
     PermissionModule,
     HotelsModule,
+    DiscountsModule,
     RoomsModule,
     FirebaseModule,
     TourModule,

@@ -106,6 +106,7 @@ export class TourController {
       );
     }
   }
+
   @Get("get/:id")
   @SkipAuth()
   async getSingleTour(@Param("id", ParseObjectIdPipe) id: string) {
@@ -119,6 +120,7 @@ export class TourController {
       );
     }
   }
+  
   @SkipAuth()
   @Get("search")
   async getTourBySearch(@Query() query: SearchTourRequestDto) {

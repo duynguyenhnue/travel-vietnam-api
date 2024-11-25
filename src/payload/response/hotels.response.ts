@@ -1,6 +1,5 @@
-import { Exclude, Expose } from "class-transformer";
-import { Types } from "mongoose";
 import { Address } from "../request/users.request";
+import { Review } from "src/schema/review.schema";
 
 export class HotelResponseDto {
   name: string;
@@ -9,7 +8,7 @@ export class HotelResponseDto {
 
   price: number;
 
-  reviews: Types.ObjectId[];
+  reviews: Review[];
 
   description: string;
 

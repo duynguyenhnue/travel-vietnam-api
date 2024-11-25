@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { CreateBookingRequest } from "src/payload/request/booking.request";
+import { CreateBookingRequest, SearchBookingRequestDto } from "src/payload/request/booking.request";
 import { Booking, BookingDocument } from "src/schema/booking.schema";
 import { TourService } from "../tour/tour.service";
 import { UserService } from "../users/users.service";
@@ -76,8 +76,11 @@ export class BookingService {
     return booking;
   }
 
-  async getAllBookings(id: string): Promise<Booking[]> {
-    return await this.bookingModel.find({ userId: id }).exec();
+  async getAllBookings(id: string): Promise<{ data: Booking[]; total: number }> {
+    const total = await this.bookingModel.countDocuments({ userId: id }).exec();
+    const bookings = await this.bookingModel.find({ userId: id }).exec();
+    console.log(total);
+    return { data: bookings, total };
   }
 
   async cancelBooking(bookingId: string): Promise<void> {
@@ -86,5 +89,40 @@ export class BookingService {
     await this.tourModel
       .findByIdAndUpdate(bookingId, booking, { new: true })
       .exec();
+  }
+
+  async getBookingBySearch(
+    query: SearchBookingRequestDto
+  ): Promise<{ data: Booking[]; total: number }> {
+    console.log(query);
+
+    const { amount, bookingType, status, limit, page } = query;
+    const offset = page * limit;
+    const filter: any = {
+      isDeleted: false,
+    };
+
+    if (amount) {
+      filter.amount = amount;
+    }
+
+    if (bookingType) {
+      filter.bookingType = bookingType;
+    }
+
+    if (status) {
+      filter.status = status;
+    }
+
+    const bookings = await this.bookingModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
+      .exec();
+
+    const total = await this.bookingModel.countDocuments(filter).exec();
+
+    return { data: bookings, total };
   }
 }

@@ -114,10 +114,6 @@ export class SearchTourRequestDto extends GetTourRequestDto {
 }
 
 export class CreateReviewRequest {
-  @IsMongoId()
-  @IsNotEmpty()
-  userId: string;
-
   @IsString()
   @IsNotEmpty()
   reviewText: string;

@@ -1,4 +1,4 @@
-import { Controller, Post, Param, Body, HttpStatus } from "@nestjs/common";
+import { Controller, Post, Param, Body, HttpStatus, Req } from "@nestjs/common";
 import { ReviewService } from "./review.service";
 import { successResponse } from "src/common/dto/response.dto";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
@@ -7,20 +7,24 @@ import { CommonException } from "src/common/exception/common.exception";
 import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
 import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
 
-@Controller("tours/:tourId/reviews")
+@Controller("reviews/:id/:type")
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.REVIEW_CREATE)
   async createReview(
-    @Param("tourId", ParseObjectIdPipe) tourId: string,
-    @Body() createReviewDto: CreateReviewRequest
+    @Param("id", ParseObjectIdPipe) id: string,
+    @Param("type") type: string,
+    @Body() createReviewDto: CreateReviewRequest,
+    @Req() req
   ) {
     try {
       const savedReview = await this.reviewService.createReview(
-        tourId,
-        createReviewDto
+        id,
+        type,
+        createReviewDto,
+        req.user.id
       );
       return successResponse(savedReview);
     } catch (error) {

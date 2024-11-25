@@ -11,26 +11,34 @@ import { Review, ReviewDocument } from "src/schema/review.schema";
 import { Tour, TourDocument } from "src/schema/tour.schema";
 import { TourService } from "../tour/tour.service";
 import { UserService } from "../users/users.service";
+import { HotelsService } from "../hotels/hotels.service";
+import { Hotel, HotelDocument } from "src/schema/hotel.schema";
 
 @Injectable()
 export class ReviewService {
   constructor(
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
     @InjectModel(Tour.name) private tourModel: Model<TourDocument>,
+    @InjectModel(Hotel.name) private hotelModel: Model<HotelDocument>,
+    private readonly userService: UserService,
     @Inject(forwardRef(() => TourService))
     private readonly tourService: TourService,
-    private readonly userService: UserService
+    // @Inject(forwardRef(() => HotelsService))
+    // private readonly hotelService: HotelsService
   ) {}
 
   async createReview(
-    tourId: string,
-    createReviewDto: CreateReviewRequest
+    id: string,
+    type: string,
+    createReviewDto: CreateReviewRequest,
+    userId: string
   ): Promise<Review> {
-    await this.tourService.getSingleTour(tourId);
-    await this.userService.findUserById(createReviewDto.userId);
+    await this.tourService.getSingleTour(id);
+    await this.userService.findUserById(userId);
     const newReview = {
       ...createReviewDto,
-      tourId,
+      tourId: id,
+      userId: userId,
     };
 
     const createReview = new this.reviewModel(newReview);
@@ -38,7 +46,7 @@ export class ReviewService {
 
     const updatedTour = await this.tourModel
       .findByIdAndUpdate(
-        tourId,
+        id,
         { $push: { reviews: savedReview._id } },
         { new: true }
       )
@@ -51,9 +59,9 @@ export class ReviewService {
     return savedReview;
   }
 
-  async getReviews(tourId: string[]): Promise<Review[]> {
+  async getReviews(id: string[]): Promise<Review[]> {
     const reviews = await this.reviewModel
-      .find({ _id: { $in: tourId } })
+      .find({ _id: { $in: id } })
       .exec();
 
     if (!reviews) {
@@ -63,9 +71,9 @@ export class ReviewService {
     return reviews;
   }
 
-  async getReviewsRating(tourId: string[]): Promise<Review[]> {
+  async getReviewsRating(id: string[]): Promise<Review[]> {
     const reviews = await this.reviewModel
-      .find({ _id: { $in: tourId } }, { _id: 0, rating: 1 })
+      .find({ _id: { $in: id } }, { _id: 0, rating: 1 })
       .exec();
 
     if (!reviews) {
