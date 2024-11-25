@@ -18,6 +18,8 @@ import * as crypto from "crypto";
 import { RefreshTokenResponse } from "../../payload/response/refresh-token.request";
 import { FirebaseService } from "../firebase/firebase.service";
 import { Folder } from "src/enums/folder.enum";
+import { MailerService } from "../mailer/mailer.service";
+import { VerificationCodeService } from "../verification-code/verification-code.service";
 
 @Injectable()
 export class AuthService {
@@ -28,7 +30,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
     private readonly refreshTokenService: RefreshTokenService,
-    private readonly firebaseService: FirebaseService
+    private readonly firebaseService: FirebaseService,
+    private readonly mailerService: MailerService,
+    private readonly verificationCodeService: VerificationCodeService
   ) {}
 
   async validateUser(authRequest: AuthRequest): Promise<any> {
@@ -96,5 +100,36 @@ export class AuthService {
 
   async logout(refresh_token: AuthLogoutRequest) {
     await this.refreshTokenService.deleteToken(refresh_token);
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) {
+      throw new CommonException("User not found", HttpStatus.NOT_FOUND);
+    }
+    const code = await this.verificationCodeService.generateCode(user._id.toString());
+    return await this.mailerService.sendEmail({
+      recipient: email,
+      subject: "Forgot password",
+      body: `Your verification code is ${code}. Please use this code to reset your password. Expire in 5 minutes.`,
+    });
+  }
+
+  async verifyCode(verifyCodeRequest: { email: string, code: string }) {
+    const user = await this.userService.findUserByEmail(verifyCodeRequest.email);
+    if (!user) {
+      throw new CommonException("User not found", HttpStatus.NOT_FOUND);
+    }
+    await this.verificationCodeService.verifyCode(user._id.toString(), verifyCodeRequest.code);
+    const password = crypto.randomBytes(5).toString('hex');
+    await this.mailerService.sendEmail({
+      recipient: user.email,
+      subject: "New password",
+      body: `Your new password is ${password}. Please use this password to login.`,
+    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await this.userService.updateUser(user._id.toString(), { password: hashedPassword });
+    return "The code is correct, and the password has been updated";
   }
 }

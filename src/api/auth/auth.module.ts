@@ -8,6 +8,8 @@ import { JwtStrategy } from "../../common/guards/jwtStratergy";
 import { RefreshTokenModule } from "../refresh-token/refresh-token.module";
 import { UserService } from "../users/users.service";
 import { FirebaseModule } from "../firebase/firebase.module";
+import { MailerModule } from "../mailer/mailer.module";
+import { VerificationCodeModule } from "../verification-code/verification-code.module";
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { FirebaseModule } from "../firebase/firebase.module";
     forwardRef(() => UserModule),
     forwardRef(() => RefreshTokenModule),
     forwardRef(() => FirebaseModule),
+    forwardRef(() => MailerModule),
+    VerificationCodeModule
   ],
 
   controllers: [AuthController],

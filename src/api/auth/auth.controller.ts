@@ -52,4 +52,18 @@ export class AuthController {
     await this.authService.logout(authLogoutRequest);
     return successResponse({ message: "Logged out successfully" });
   }
+
+  @SkipAuth()
+  @Post("forgot-password")
+  async forgotPassword(@Body() emailRequest: { email: string }) {
+    const result = await this.authService.forgotPassword(emailRequest.email);
+    return successResponse(result);
+  }
+
+  @SkipAuth()
+  @Post("verify-code")
+  async verifyCode(@Body() verifyCodeRequest: { email: string, code: string }) {
+    const result = await this.authService.verifyCode(verifyCodeRequest);
+    return successResponse(result);
+  }
 }
