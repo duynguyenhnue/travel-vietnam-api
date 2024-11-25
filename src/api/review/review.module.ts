@@ -7,14 +7,16 @@ import { TourModule } from "../tour/tour.module";
 import { UserModule } from "../users/users.module";
 import { PermissionModule } from "../permission/permission.module";
 import { RoleModule } from "../roles/role.module";
+import { HotelsModule } from "../hotels/hotels.module";
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Review.name, schema: ReviewSchema }]),
     forwardRef(() => TourModule),
+    forwardRef(() => HotelsModule),
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
-    UserModule,
+    UserModule
   ],
   controllers: [ReviewController],
   providers: [ReviewService],

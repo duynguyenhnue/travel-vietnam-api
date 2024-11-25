@@ -12,10 +12,9 @@ import { FirebaseService } from "../firebase/firebase.service";
 import { Folder } from "src/enums/folder.enum";
 import { HotelsService } from "../hotels/hotels.service";
 import { ReviewService } from "../review/review.service";
-import { promises } from "dns";
 import { TourResponse } from "src/payload/response/tours.response";
-import { plainToInstance } from "class-transformer";
 import { TourStatus } from "src/enums/booking.enum";
+import { UserService } from "../users/users.service";
 
 @Injectable()
 export class TourService {
@@ -23,7 +22,8 @@ export class TourService {
     @InjectModel(Tour.name) private tourModel: Model<TourDocument>,
     private readonly firebaseService: FirebaseService,
     private readonly hotelsService: HotelsService,
-    private readonly reviewService: ReviewService
+    private readonly reviewService: ReviewService,
+    private readonly userService: UserService
   ) {}
 
   async createTour(
@@ -105,7 +105,6 @@ export class TourService {
 
   async getSingleTour(id: string): Promise<TourResponse> {
     const tour = await this.tourModel.findById(id).populate("reviews").exec();
-
     if (!tour) {
       throw new NotFoundException("Tour not found");
     }
@@ -114,7 +113,21 @@ export class TourService {
       tour.reviews as unknown as string[]
     );
 
-    return { ...tour.toObject(), reviews };
+    const reviewsWithUserDetails = await Promise.all(
+      reviews.map(async (review) => {
+        const user = await this.userService.findUserById(review.userId);
+        return {
+          userId: review.userId,
+          avatar: user.avatar,
+          fullName: user.fullName,
+          rating: review.rating,
+          reviewText: review.reviewText,
+          createdAt: review.createdAt,
+          updatedAt: review.updatedAt,
+        };
+      })
+    );
+    return { ...tour.toObject(), reviews: reviewsWithUserDetails };
   }
 
   async getAllTours(

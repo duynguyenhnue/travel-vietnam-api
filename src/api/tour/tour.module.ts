@@ -9,16 +9,18 @@ import { ReviewModule } from "../review/review.module";
 import { NotificationModule } from "src/api/notification/notification.module";
 import { RoleModule } from "../roles/role.module";
 import { PermissionModule } from "../permission/permission.module";
+import { UserModule } from "../users/users.module";
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Tour.name, schema: TourSchema }]),
     FirebaseModule,
+    NotificationModule,
     HotelsModule,
     forwardRef(() => ReviewModule),
-    NotificationModule,
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
+    UserModule
   ],
   controllers: [TourController],
   providers: [TourService],

@@ -6,6 +6,9 @@ import { Hotel, HotelSchema } from "src/schema/hotel.schema";
 import { FirebaseModule } from "../firebase/firebase.module";
 import { RoleModule } from "../roles/role.module";
 import { PermissionModule } from "../permission/permission.module";
+import { ReviewModule } from "../review/review.module";
+import { UserModule } from "../users/users.module";
+import { TourModule } from "../tour/tour.module";
 
 @Module({
   imports: [
@@ -13,9 +16,12 @@ import { PermissionModule } from "../permission/permission.module";
     FirebaseModule,
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
+    // forwardRef(() => ReviewModule),
+    // forwardRef(() => TourModule),
+    UserModule
   ],
   controllers: [HotelsController],
   providers: [HotelsService],
-  exports: [HotelsService],
+  exports: [HotelsService, MongooseModule],
 })
 export class HotelsModule {}

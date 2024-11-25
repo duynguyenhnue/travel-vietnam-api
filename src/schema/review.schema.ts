@@ -5,8 +5,11 @@ export type ReviewDocument = Review & Document;
 
 @Schema({ timestamps: true })
 export class Review {
-  @Prop({ type: Types.ObjectId, ref: "tour", required: true })
-  tourId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "tour", required: false })
+  tourId?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: "hotel", required: false })
+  hotelId?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: "user", required: true })
   userId: string;
@@ -16,6 +19,18 @@ export class Review {
 
   @Prop({ required: true, min: 0, max: 5, default: 0 })
   rating: number;
+
+  @Prop({ required: false })
+  avatar?: string;
+
+  @Prop({ required: false })
+  fullName?: string;
+
+  @Prop({ required: false })
+  createdAt?: Date;
+
+  @Prop({ required: false })
+  updatedAt?: Date;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
