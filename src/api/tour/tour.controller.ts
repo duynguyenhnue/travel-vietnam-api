@@ -43,8 +43,6 @@ export class TourController {
     @Req() req
   ) {
     try {
-      console.log(req.user);
-
       const savedTour = await this.tourService.createTour(createTourDto, files);
       this.notificationService.logNotification({
         title: "New Tour Created",

@@ -93,7 +93,15 @@ export class GetTourRequestDto {
 export class SearchTourRequestDto extends GetTourRequestDto {
   @IsString()
   @IsOptional()
-  title?: string;
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  departurePoint?: string;
+
+  @IsString()
+  @IsOptional()
+  destination?: string;
 
   @IsOptional()
   groupSize?: number;
