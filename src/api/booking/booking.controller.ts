@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Param, Body, HttpStatus } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  HttpStatus,
+  Req,
+} from "@nestjs/common";
 import { BookingService } from "./booking.service";
 import { successResponse } from "src/common/dto/response.dto";
 import { CommonException } from "src/common/exception/common.exception";
@@ -57,10 +65,9 @@ export class BookingController {
   }
 
   @Get()
-  @SkipAuth()
-  async getAllBookings() {
+  async getAllBookings(@Req() req) {
     try {
-      const bookings = await this.bookingService.getAllBookings();
+      const bookings = await this.bookingService.getAllBookings(req.user._id);
       return successResponse(bookings);
     } catch (error) {
       throw new CommonException(

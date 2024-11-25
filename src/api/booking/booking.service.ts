@@ -76,8 +76,8 @@ export class BookingService {
     return booking;
   }
 
-  async getAllBookings(): Promise<Booking[]> {
-    return await this.bookingModel.find().exec();
+  async getAllBookings(id: string): Promise<Booking[]> {
+    return await this.bookingModel.find({ userId: id }).exec();
   }
 
   async cancelBooking(bookingId: string): Promise<void> {
