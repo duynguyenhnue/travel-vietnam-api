@@ -39,7 +39,7 @@ export class AuthService {
     }
     return null;
   }
- 
+
   async login(authRequest: AuthRequest): Promise<any> {
     const user = await this.validateUser(authRequest);
 
@@ -50,7 +50,7 @@ export class AuthService {
     const payload = { email: user.email, sub: user._id, role: user.role };
     const access_token = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET || "JWT_SECRET",
-      expiresIn: "15m",
+      expiresIn: "7d",
     });
     const refresh_token = crypto.randomBytes(16).toString("hex");
 

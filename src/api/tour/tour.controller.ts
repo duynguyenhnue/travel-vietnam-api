@@ -109,6 +109,7 @@ export class TourController {
     }
   }
   @Get("get/:id")
+  @SkipAuth()
   async getSingleTour(@Param("id", ParseObjectIdPipe) id: string) {
     try {
       const tour = await this.tourService.getSingleTour(id);

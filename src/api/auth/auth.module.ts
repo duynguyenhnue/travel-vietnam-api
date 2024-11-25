@@ -12,10 +12,10 @@ import { FirebaseModule } from "../firebase/firebase.module";
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: "jwt" }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || "JWT_SECRET",
-      signOptions: { expiresIn: "15m" },
-    }),
+      JwtModule.register({
+        secret: process.env.JWT_SECRET || "JWT_SECRET",
+        signOptions: { expiresIn: "7d" },
+      }),
     forwardRef(() => UserModule),
     forwardRef(() => RefreshTokenModule),
     forwardRef(() => FirebaseModule),
