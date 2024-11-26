@@ -138,7 +138,7 @@ export class HotelsService {
     if (files) {
       await Promise.all(
         files.map(async (file) => {
-          newData.images.push(
+          newData.photos.push(
             await this.firebaseService.uploadImage(file, Folder.HOTELS)
           );
         })

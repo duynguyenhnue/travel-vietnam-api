@@ -55,7 +55,7 @@ export class CreateHotelRequestDto {
 export class UpdateHotelRequestDto extends PartialType(CreateHotelRequestDto) {
   @IsArray()
   @IsString({ each: true })
-  images: string[];
+  photos: string[];
 }
 
 export class searchHotelIdRequestDto {
