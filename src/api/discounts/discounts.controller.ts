@@ -25,7 +25,7 @@ export class DiscountController {
   constructor(private readonly discountService: DiscountService) { }
 
   @Post()
-  @AuthJwtAccessProtected(AUTH_PERMISSIONS.HOTEL_CREATE)
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.DISCOUNT_CREATE)
   async create(
     @Body() createDiscountDto: CreateDiscountRequestDto
   ) {
@@ -61,7 +61,7 @@ export class DiscountController {
   }
 
   @Put(":id")
-  @AuthJwtAccessProtected(AUTH_PERMISSIONS.HOTEL_UPDATE)
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.DISCOUNT_UPDATE)
   @UseInterceptors(FilesInterceptor("files"))
   async update(
     @Param("id") id: ObjectId,
@@ -80,7 +80,7 @@ export class DiscountController {
   }
 
   @Delete(":id")
-  @AuthJwtAccessProtected(AUTH_PERMISSIONS.HOTEL_DELETE)
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.DISCOUNT_DELETE)
   async delete(@Param("id") id: ObjectId) {
     try {
       return successResponse(await this.discountService.delete(id));
