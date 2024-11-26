@@ -47,7 +47,7 @@ export class DiscountService {
     if (type && type.trim() !== "") {
       filter.type = type;
     }
-    if (value && !isNaN(Number(value))) {
+    if (value && !isNaN(Number(value)) && value != 0) {
       filter.value = { $lte: parseInt(value.toString(), 10) };
     }
 
