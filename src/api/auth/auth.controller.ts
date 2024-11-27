@@ -4,6 +4,7 @@ import {
   Body,
   UseInterceptors,
   UploadedFiles,
+  Req,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RefreshTokenRequest } from "../../payload/request/refresh-token.request";
@@ -22,8 +23,12 @@ export class AuthController {
 
   @SkipAuth()
   @Post("login")
-  async login(@Body() authRequest: AuthRequest) {
-    const result = await this.authService.login(authRequest);
+  async login(@Body() authRequest: AuthRequest, @Req() req: Request) {
+    const result = await this.authService.login(
+      authRequest,
+      req.headers["origin"]
+    );
+
     return successResponse(result);
   }
 
@@ -62,7 +67,7 @@ export class AuthController {
 
   @SkipAuth()
   @Post("verify-code")
-  async verifyCode(@Body() verifyCodeRequest: { email: string, code: string }) {
+  async verifyCode(@Body() verifyCodeRequest: { email: string; code: string }) {
     const result = await this.authService.verifyCode(verifyCodeRequest);
     return successResponse(result);
   }
