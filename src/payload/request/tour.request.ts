@@ -122,4 +122,12 @@ export class CreateReviewRequest {
   @Min(0)
   @Max(5)
   rating: number;
+
+  @IsString()
+  @IsOptional()
+  hotelId?: string;
+
+  @IsString()
+  @IsOptional()
+  tourId?: string;
 }

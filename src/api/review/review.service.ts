@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, ObjectId } from "mongoose";
+import { Model } from "mongoose";
 import { CreateReviewRequest } from "src/payload/request/tour.request";
 import { Review, ReviewDocument } from "src/schema/review.schema";
 import { Tour, TourDocument } from "src/schema/tour.schema";
@@ -23,39 +23,65 @@ export class ReviewService {
     private readonly userService: UserService,
     @Inject(forwardRef(() => TourService))
     private readonly tourService: TourService,
-    // @Inject(forwardRef(() => HotelsService))
-    // private readonly hotelService: HotelsService
+    @Inject(forwardRef(() => HotelsService))
+    private readonly hotelService: HotelsService,
   ) {}
 
   async createReview(
     id: string,
     type: string,
     createReviewDto: CreateReviewRequest,
-    userId: string
+    userId: string,
   ): Promise<Review> {
-    await this.tourService.getSingleTour(id);
+    if (type === "tour") {
+      await this.tourService.getSingleTour(id);
+    } else if (type === "hotel") {
+      await this.hotelService.getSingleHotel(id);
+    }
     await this.userService.findUserById(userId);
-    const newReview = {
-      ...createReviewDto,
-      tourId: id,
-      userId: userId,
-    };
+    let newReview;
+    if (type === "tour") {
+      newReview = {
+        ...createReviewDto,
+        userId: userId,
+        tourId: id,
+      };
+    } else if (type === "hotel") {
+      newReview = {
+        ...createReviewDto,
+        userId: userId,
+        hotelId: id,
+      };
+    }
 
-    const createReview = new this.reviewModel(newReview);
+    const createReview = new this.reviewModel(newReview); 
     const savedReview = await createReview.save();
 
-    const updatedTour = await this.tourModel
+    if (type === "tour") {
+      const updatedTour = await this.tourModel
+        .findByIdAndUpdate(
+          id,
+          { $push: { reviews: savedReview._id } },
+          { new: true }
+      )
+        .exec();
+
+      if (!updatedTour) {
+        throw new NotFoundException("Tour not found");
+      }
+    } else if (type === "hotel") {
+      const updatedHotel = await this.hotelModel
       .findByIdAndUpdate(
         id,
         { $push: { reviews: savedReview._id } },
         { new: true }
       )
-      .exec();
+        .exec();
 
-    if (!updatedTour) {
-      throw new NotFoundException("Tour not found");
+      if (!updatedHotel) {
+        throw new NotFoundException("Hotel not found");
+      }
     }
-
     return savedReview;
   }
 
