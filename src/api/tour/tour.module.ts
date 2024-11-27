@@ -20,7 +20,7 @@ import { UserModule } from "../users/users.module";
     forwardRef(() => ReviewModule),
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
-    UserModule
+    UserModule,
   ],
   controllers: [TourController],
   providers: [TourService],

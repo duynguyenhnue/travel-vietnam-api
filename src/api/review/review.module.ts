@@ -16,7 +16,7 @@ import { HotelsModule } from "../hotels/hotels.module";
     forwardRef(() => HotelsModule),
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
-    UserModule
+    UserModule,
   ],
   controllers: [ReviewController],
   providers: [ReviewService],

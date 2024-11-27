@@ -27,6 +27,9 @@ export class Room extends Document {
 
   @Prop({ required: true })
   hotelId: string;
+
+  @Prop({ default: false })
+  status: boolean;
 }
 
 export const RoomSchema = SchemaFactory.createForClass(Room);

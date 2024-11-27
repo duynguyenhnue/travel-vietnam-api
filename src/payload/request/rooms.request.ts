@@ -42,9 +42,9 @@ export class CreateRoomRequestDto {
   readonly roomType: RoomType;
 
   @IsString()
-  @Matches(/^[1-6]$/, {
+  @Matches(/^[1-4]$/, {
     message:
-      "Occupancy must be a string containing an integer between 1 and 6.",
+      "Occupancy must be a string containing an integer between 1 and 4.",
   })
   readonly maxOccupancy: number;
 }

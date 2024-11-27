@@ -18,5 +18,6 @@ import { PermissionModule } from "../permission/permission.module";
   ],
   controllers: [RoomsController],
   providers: [RoomsService],
+  exports: [RoomsService, MongooseModule],
 })
 export class RoomsModule {}

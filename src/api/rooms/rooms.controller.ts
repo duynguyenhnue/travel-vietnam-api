@@ -32,7 +32,7 @@ export class RoomsController {
 
   @Post()
   @UseInterceptors(FilesInterceptor("files"))
-  @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROOM_CREATE)
+  // @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROOM_CREATE)
   async create(
     @Body() createRoomDto: CreateRoomRequestDto,
     @UploadedFiles() files: Express.Multer.File[]

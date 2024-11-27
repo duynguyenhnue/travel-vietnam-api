@@ -1,5 +1,12 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsString, IsNumber, Min, IsEnum, IsOptional } from "class-validator";
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  Min,
+  IsEnum,
+  IsOptional,
+} from "class-validator";
 import { BookingStatus, BookingType } from "src/enums/booking.enum";
 
 export class CreateBookingRequest {
@@ -10,6 +17,15 @@ export class CreateBookingRequest {
   @IsString()
   @IsNotEmpty()
   orderId: string;
+
+  @IsOptional()
+  roomId: string;
+
+  @IsOptional()
+  startDate: string;
+
+  @IsOptional()
+  endDate: string;
 
   @IsString()
   @IsNotEmpty()
@@ -39,7 +55,7 @@ export class GetBookingRequestDto {
 
 export class SearchBookingRequestDto extends GetBookingRequestDto {
   amount?: number;
-  
+
   bookingType?: BookingType;
 
   @IsOptional()

@@ -4,18 +4,25 @@ import moment from "moment";
 import * as qs from "qs";
 import { BookingService } from "../booking/booking.service";
 import { BookingType } from "src/enums/booking.enum";
+import { RoomsService } from "../rooms/rooms.service";
 
 @Injectable()
 export class VnpayService {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(
+    private readonly bookingService: BookingService,
+    private roomService: RoomsService
+  ) {}
   private tmnCode = process.env.VNPAY_TMN_CODE;
   private secretKey = process.env.VNPAY_HASH_SECRET;
   private vnpUrl = process.env.VNPAY_URL;
   private returnUrl = process.env.VNPAY_RETURN_URL;
 
   async getTypeBooking(code, status) {
-    return (await this.bookingService.getBookingByCode(code, status))
-      .bookingType;
+    return await this.bookingService.getBookingByCode(code, status);
+  }
+
+  async roomStatus(id) {
+    return await this.roomService.roomStatus(id, true);
   }
 
   async createPaymentUrl(
@@ -23,7 +30,10 @@ export class VnpayService {
       amount: number;
       bookingType: BookingType;
       guestSize: number;
+      roomId: string;
       orderId: string;
+      startDate: string;
+      endDate: string;
     },
     userId: string
   ): Promise<string> {
@@ -67,10 +77,13 @@ export class VnpayService {
       await this.bookingService.createBooking({
         amount,
         userId: userId,
+        roomId: body.roomId,
         orderId: body.orderId,
         vnpayCode: orderId,
         guestSize: body.guestSize,
         bookingType: body.bookingType,
+        startDate: body.startDate,
+        endDate: body.endDate,
       });
 
       return `${this.vnpUrl}?${qs.stringify(vnp_Params, { encode: false })}`;
@@ -84,7 +97,7 @@ export class VnpayService {
     let secureHash = vnpParams.vnp_SecureHash;
     const secretKey = process.env.VNPAY_HASH_SECRET;
 
-    if (vnpParams.vnp_BankCode === "VNPAY") {
+    if (vnpParams.vnp_TransactionStatus !== "00") {
       return false;
     }
     delete vnpParams.vnp_SecureHash;
