@@ -10,6 +10,8 @@ import { NotificationModule } from "src/api/notification/notification.module";
 import { RoleModule } from "../roles/role.module";
 import { PermissionModule } from "../permission/permission.module";
 import { UserModule } from "../users/users.module";
+import { PassportModule } from "@nestjs/passport";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -21,6 +23,11 @@ import { UserModule } from "../users/users.module";
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
     UserModule,
+    PassportModule.register({ defaultStrategy: "jwt" }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || "JWT_SECRET",
+      signOptions: { expiresIn: "7d" },
+    }),
   ],
   controllers: [TourController],
   providers: [TourService],

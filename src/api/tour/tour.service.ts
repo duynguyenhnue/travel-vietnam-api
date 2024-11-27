@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UploadedFiles } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  UploadedFiles,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import {
@@ -15,6 +20,7 @@ import { ReviewService } from "../review/review.service";
 import { TourResponse } from "src/payload/response/tours.response";
 import { TourStatus } from "src/enums/booking.enum";
 import { UserService } from "../users/users.service";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class TourService {
@@ -23,12 +29,14 @@ export class TourService {
     private readonly firebaseService: FirebaseService,
     private readonly hotelsService: HotelsService,
     private readonly reviewService: ReviewService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private jwtService: JwtService
   ) {}
 
   async createTour(
     createTourDto: CreateTourDto,
-    files: Express.Multer.File[]
+    files: Express.Multer.File[],
+    userId: string
   ): Promise<Tour> {
     await this.hotelsService.findOne(createTourDto.hotelId);
 
@@ -41,6 +49,7 @@ export class TourService {
     const newTour = {
       ...createTourDto,
       photos,
+      userId,
     };
 
     const createTour = new this.tourModel(newTour);
@@ -149,13 +158,18 @@ export class TourService {
   }
 
   async getTourBySearch(
-    query: SearchTourRequestDto
+    query: SearchTourRequestDto,
+    user: any
   ): Promise<{ data: TourResponse[]; total: number }> {
     const { name, departurePoint, destination, groupSize, limit, page } = query;
     const offset = page * limit;
     const filter: any = {
       isDeleted: false,
     };
+
+    if (user && user.role !== "USER" && user.role !== "ADMIN") {
+      filter.userId = user.sub;
+    }
 
     if (name) {
       filter.title = new RegExp(name, "i");
@@ -199,5 +213,16 @@ export class TourService {
     const total = await this.tourModel.countDocuments(filter).exec();
 
     return { data: toursMap, total };
+  }
+
+  async validateToken(token: string): Promise<any> {
+    try {
+      const decoded = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET, // Secret key của bạn
+      });
+      return decoded; // Trả về payload sau khi giải mã
+    } catch (error) {
+      throw new UnauthorizedException("Invalid or expired token");
+    }
   }
 }

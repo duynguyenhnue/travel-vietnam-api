@@ -2,6 +2,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
   UploadedFiles,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
@@ -20,6 +21,8 @@ import { CommonException } from "src/common/exception/common.exception";
 import { UserService } from "../users/users.service";
 import { Room } from "src/schema/room.schema";
 import { Review } from "src/schema/review.schema";
+import { User } from "src/schema/user.schema";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class HotelsService {
@@ -28,12 +31,14 @@ export class HotelsService {
     @InjectModel(Room.name) private roomModel: Model<Room>,
     @InjectModel(Review.name) private reviewModel: Model<Review>,
     private readonly firebaseService: FirebaseService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private jwtService: JwtService
   ) {}
 
   async create(
     createHotelDto: CreateHotelRequestDto,
-    files: Express.Multer.File[]
+    files: Express.Multer.File[],
+    userId: ObjectId
   ): Promise<HotelResponseDto> {
     const photos = await Promise.all(
       (files || []).map(async (file) => {
@@ -44,20 +49,36 @@ export class HotelsService {
     const data = {
       ...createHotelDto,
       photos,
+      userId,
     };
 
     const createdHotel = new this.hotelModel(data);
     const savedHotel = await createdHotel.save();
     return plainToInstance(HotelResponseDto, savedHotel.toObject());
   }
+  async validateToken(token: string): Promise<any> {
+    try {
+      const decoded = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET, // Secret key của bạn
+      });
+      return decoded; // Trả về payload sau khi giải mã
+    } catch (error) {
+      throw new UnauthorizedException("Invalid or expired token");
+    }
+  }
 
   async getHotelBySearch(
-    query: SearchHotelsRequestDto
+    query: SearchHotelsRequestDto,
+    user: any | null
   ): Promise<{ data: HotelResponseDto[]; total: number }> {
     const { name, maxGroupSize, limit, page, price, status, city } = query;
     const offset = page * limit;
 
     const filter: any = {};
+
+    if (user && user.role !== "USER" && user.role !== "ADMIN") {
+      filter.userId = user.sub;
+    }
 
     if (name && name.trim() !== "") {
       filter.name = new RegExp(name, "i");

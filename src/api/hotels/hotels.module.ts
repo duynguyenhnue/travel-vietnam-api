@@ -12,6 +12,9 @@ import { TourModule } from "../tour/tour.module";
 import { RoomsModule } from "../rooms/rooms.module";
 import { Room, RoomSchema } from "src/schema/room.schema";
 import { Review, ReviewSchema } from "src/schema/review.schema";
+import { PassportModule } from "@nestjs/passport";
+import { JwtStrategy } from "src/common/guards/jwtStratergy";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -19,6 +22,11 @@ import { Review, ReviewSchema } from "src/schema/review.schema";
     MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
     MongooseModule.forFeature([{ name: Review.name, schema: ReviewSchema }]),
     FirebaseModule,
+    PassportModule.register({ defaultStrategy: "jwt" }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || "JWT_SECRET",
+      signOptions: { expiresIn: "7d" },
+    }),
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
     // forwardRef(() => ReviewModule),

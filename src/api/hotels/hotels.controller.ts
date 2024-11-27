@@ -10,6 +10,8 @@ import {
   UseInterceptors,
   HttpStatus,
   Query,
+  Req,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { HotelsService } from "./hotels.service";
 import {
@@ -25,6 +27,7 @@ import { ObjectId } from "mongoose";
 import { successResponse } from "src/common/dto/response.dto";
 import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
 import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
+import { JwtService } from "@nestjs/jwt";
 
 @Controller("hotels")
 export class HotelsController {
@@ -35,11 +38,12 @@ export class HotelsController {
   @UseInterceptors(FilesInterceptor("files"))
   async create(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body() createHotelDto: CreateHotelRequestDto
+    @Body() createHotelDto: CreateHotelRequestDto,
+    @Req() req
   ) {
     try {
       return successResponse(
-        await this.hotelsService.create(createHotelDto, files)
+        await this.hotelsService.create(createHotelDto, files, req.user._id)
       );
     } catch (error) {
       throw new CommonException(
@@ -51,8 +55,18 @@ export class HotelsController {
 
   @Get("/search")
   @SkipAuth()
-  async searchHotel(@Query() query: SearchHotelsRequestDto) {
-    return successResponse(await this.hotelsService.getHotelBySearch(query));
+  async searchHotel(@Query() query: SearchHotelsRequestDto, @Req() req) {
+    const authHeader = req.headers.authorization;
+    let user = null;
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
+
+      user = await this.hotelsService.validateToken(token);
+    }
+
+    return successResponse(
+      await this.hotelsService.getHotelBySearch(query, user)
+    );
   }
 
   @Get(":id")
