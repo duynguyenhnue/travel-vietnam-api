@@ -59,7 +59,9 @@ export class HotelsController {
   @SkipAuth()
   async findOne(@Param("id") id: ObjectId) {
     try {
-      return successResponse(await this.hotelsService.findOne(id));
+      return successResponse(
+        await this.hotelsService.findOne(id)
+      );
     } catch (error) {
       throw new CommonException(
         error.message,
@@ -78,7 +80,7 @@ export class HotelsController {
   ) {
     try {
       return successResponse(
-        await this.hotelsService.update(id, updateHotelDto, files)
+        await this.hotelsService.update(id.toString(), updateHotelDto, files)
       );
     } catch (error) {
       throw new CommonException(
