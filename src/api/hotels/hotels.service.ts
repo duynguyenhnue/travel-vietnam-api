@@ -109,9 +109,12 @@ export class HotelsService {
 
     const hotelsMap: HotelResponseDto[] = await Promise.all(
       hotels.map(async (hotel) => {
-        return { ...hotel.toObject() };
-      })
-    );
+        const reviews = await this.getReviews(
+          hotel.reviews as unknown as string[]
+        );
+        return { ...hotel.toObject(), reviews };
+        })
+      );
 
     const total = await this.hotelModel.countDocuments(filter).exec();
 
@@ -124,7 +127,9 @@ export class HotelsService {
       throw new NotFoundException("Hotel not found");
     }
 
-    const reviews = await this.getReviews(hotel.reviews as unknown as string[]);
+    const reviews = await this.getReviews(
+      hotel.reviews as unknown as string[]
+    );
 
     const reviewsWithUserDetails = await Promise.all(
       reviews.map(async (review) => {
@@ -144,7 +149,9 @@ export class HotelsService {
   }
 
   async getReviews(id: string[]): Promise<Review[]> {
-    const reviews = await this.reviewModel.find({ _id: { $in: id } }).exec();
+    const reviews = await this.reviewModel
+      .find({ _id: { $in: id } })
+      .exec();
 
     if (!reviews) {
       throw new NotFoundException("Review not found");
@@ -153,29 +160,48 @@ export class HotelsService {
     return reviews;
   }
 
-  async findOne(id: ObjectId): Promise<{ hotel: Hotel; rooms: Room[] }> {
-    const hotel = await this.hotelModel.findById(id).exec();
-
+  async findOne(id: ObjectId): Promise<{ hotel: HotelResponseDto; rooms: Room[] }> {
+    const hotel = await this.hotelModel.findById(id).populate("reviews").exec();
     if (!hotel) {
-      throw new CommonException("Hotel not found", HttpStatus.NOT_FOUND);
+      throw new NotFoundException("Hotel not found");
     }
+
+    const reviews = await this.getReviews(
+      hotel.reviews as unknown as string[]
+    );
+
+    const reviewsWithUserDetails = await Promise.all(
+      reviews.map(async (review) => {
+        const user = await this.userService.findUserById(review.userId);
+        return {
+          userId: review.userId,
+          avatar: user.avatar,
+          fullName: user.fullName,
+          rating: review.rating,
+          reviewText: review.reviewText,
+          createdAt: review.createdAt,
+          updatedAt: review.updatedAt,
+        };
+      })
+    );
+    const hotelNew = { ...hotel.toObject(), reviews: reviewsWithUserDetails }
 
     const rooms = await this.roomModel
       .find({ hotelId: id, status: false })
       .exec();
 
     return {
-      hotel: hotel,
+      hotel: hotelNew,
       rooms: rooms,
     };
   }
 
   async update(
-    id: ObjectId,
+    id: string,
     updateHotelDto: UpdateHotelRequestDto,
     @UploadedFiles() files: Express.Multer.File[]
-  ): Promise<HotelResponseDto> {
-    await this.findOne(id);
+  ): Promise<Hotel> {
+    await this.getSingleHotel(id);
 
     const newData = updateHotelDto;
 
@@ -192,7 +218,7 @@ export class HotelsService {
     const updatedHotel = await this.hotelModel
       .findByIdAndUpdate(id, newData, { new: true })
       .exec();
-    return plainToInstance(HotelResponseDto, updatedHotel.toObject());
+    return updatedHotel;
   }
 
   async delete(id: ObjectId): Promise<string> {
