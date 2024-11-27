@@ -44,10 +44,18 @@ export class AuthService {
     return null;
   }
 
-  async login(authRequest: AuthRequest): Promise<any> {
+  async login(authRequest: AuthRequest, origin: string): Promise<any> {
     const user = await this.validateUser(authRequest);
 
     if (!user) {
+      throw new CommonException("Unauthorized", HttpStatus.UNAUTHORIZED);
+    }
+
+    if (user.status === "INACTIVE") {
+      throw new CommonException("User is inactive", HttpStatus.UNAUTHORIZED);
+    }
+
+    if (origin === process.env.DOMAIN_ADMIN && user.role === "USER") {
       throw new CommonException("Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
@@ -107,7 +115,9 @@ export class AuthService {
     if (!user) {
       throw new CommonException("User not found", HttpStatus.NOT_FOUND);
     }
-    const code = await this.verificationCodeService.generateCode(user._id.toString());
+    const code = await this.verificationCodeService.generateCode(
+      user._id.toString()
+    );
     return await this.mailerService.sendEmail({
       recipient: email,
       subject: "Forgot password",
@@ -115,13 +125,18 @@ export class AuthService {
     });
   }
 
-  async verifyCode(verifyCodeRequest: { email: string, code: string }) {
-    const user = await this.userService.findUserByEmail(verifyCodeRequest.email);
+  async verifyCode(verifyCodeRequest: { email: string; code: string }) {
+    const user = await this.userService.findUserByEmail(
+      verifyCodeRequest.email
+    );
     if (!user) {
       throw new CommonException("User not found", HttpStatus.NOT_FOUND);
     }
-    await this.verificationCodeService.verifyCode(user._id.toString(), verifyCodeRequest.code);
-    const password = crypto.randomBytes(5).toString('hex');
+    await this.verificationCodeService.verifyCode(
+      user._id.toString(),
+      verifyCodeRequest.code
+    );
+    const password = crypto.randomBytes(5).toString("hex");
     await this.mailerService.sendEmail({
       recipient: user.email,
       subject: "New password",
@@ -129,7 +144,9 @@ export class AuthService {
     });
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await this.userService.updateUser(user._id.toString(), { password: hashedPassword });
+    await this.userService.updateUser(user._id.toString(), {
+      password: hashedPassword,
+    });
     return "The code is correct, and the password has been updated";
   }
 }

@@ -98,6 +98,7 @@ jobs:
             -e WEBSOCKET_URL="https://socket.travel-vietnamese.me" \
             -e PORT=8080 \
             -e VNPAY_TMN_CODE=V65MNMN3 \
+            -e DOMAIN_ADMIN=https://admin.travel-vietnamese.me \
             -e VNPAY_HASH_SECRET=32CFKSOQ7R4EISE9944JRCAHPDCXXA7J \
             -e VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html \
             -e VNPAY_RETURN_URL=https://travel-vietnamese.me/vnpay/vnpay_return \
