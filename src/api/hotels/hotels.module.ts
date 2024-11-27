@@ -11,11 +11,13 @@ import { UserModule } from "../users/users.module";
 import { TourModule } from "../tour/tour.module";
 import { RoomsModule } from "../rooms/rooms.module";
 import { Room, RoomSchema } from "src/schema/room.schema";
+import { Review, ReviewSchema } from "src/schema/review.schema";
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Hotel.name, schema: HotelSchema }]),
     MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
+    MongooseModule.forFeature([{ name: Review.name, schema: ReviewSchema }]),
     FirebaseModule,
     forwardRef(() => RoleModule),
     forwardRef(() => PermissionModule),
