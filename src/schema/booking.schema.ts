@@ -12,6 +12,15 @@ export class Booking {
   @Prop({ required: true })
   orderId: string;
 
+  @Prop({ default: null })
+  roomId: string;
+
+  @Prop({ default: null })
+  startDate: Date;
+
+  @Prop({ default: null })
+  endDate: Date;
+
   @Prop({ required: true })
   amount: number;
 

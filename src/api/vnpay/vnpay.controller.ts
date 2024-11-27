@@ -27,6 +27,9 @@ export class VnpayController {
       bookingType: BookingType;
       guestSize: number;
       orderId: string;
+      roomId: string;
+      startDate: string;
+      endDate: string;
     },
     @Req() req
   ) {
@@ -59,13 +62,15 @@ export class VnpayController {
       const isValid = await this.vnpayService.verifyReturn(query);
 
       if (isValid) {
-        const typeBooking = await this.vnpayService.getTypeBooking(
+        const booking = await this.vnpayService.getTypeBooking(
           query.vnp_TxnRef,
           BookingStatus.CONFIRMED
         );
+        const room = await this.vnpayService.roomStatus(booking.roomId);
+
         return successResponse({
           status: BookingStatus.CONFIRMED,
-          bookingType: typeBooking,
+          bookingType: booking.bookingType,
           amount: query.vnp_Amount / 100,
           txnRef: query.vnp_TxnRef,
           responseCode: query.vnp_ResponseCode,

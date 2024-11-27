@@ -22,6 +22,21 @@ export class RoomsService {
     private readonly hotelsService: HotelsService
   ) {}
 
+  async roomStatus(roomId: ObjectId, status: boolean) {
+    const room = await this.roomModel.findById(roomId).exec();
+
+    if (!room) {
+      throw new CommonException(
+        `Room with ID { ${roomId} } not found`,
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    room.status = status;
+
+    await room.save();
+  }
+
   async create(
     createRoomDto: CreateRoomRequestDto,
     @UploadedFiles() files: Express.Multer.File[]

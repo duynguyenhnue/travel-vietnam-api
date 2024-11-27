@@ -1,4 +1,11 @@
-import { forwardRef, HttpStatus, Inject, Injectable, NotFoundException, UploadedFiles } from "@nestjs/common";
+import {
+  forwardRef,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UploadedFiles,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, ObjectId } from "mongoose";
 import { plainToInstance } from "class-transformer";
@@ -16,12 +23,15 @@ import { ReviewService } from "../review/review.service";
 import { UserService } from "../users/users.service";
 import { ReviewModule } from "../review/review.module";
 import { UserModule } from "../users/users.module";
+import { Room } from "src/schema/room.schema";
+import { RoomsService } from "../rooms/rooms.service";
 
 @Injectable()
 export class HotelsService {
   constructor(
     @InjectModel(Hotel.name) private hotelModel: Model<Hotel>,
     private readonly firebaseService: FirebaseService,
+    @InjectModel(Room.name) private roomModel: Model<Room>
   ) {}
 
   async create(
@@ -117,13 +127,21 @@ export class HotelsService {
   //   return { ...hotel.toObject(), reviews: reviewsWithUserDetails };
   // }
 
-  async findOne(id: ObjectId): Promise<HotelResponseDto> {
+  async findOne(id: ObjectId): Promise<{ hotel: Hotel; rooms: Room[] }> {
     const hotel = await this.hotelModel.findById(id).exec();
 
     if (!hotel) {
       throw new CommonException("Hotel not found", HttpStatus.NOT_FOUND);
     }
-    return plainToInstance(HotelResponseDto, hotel.toObject());
+
+    const rooms = await this.roomModel
+      .find({ hotelId: id, status: false })
+      .exec();
+
+    return {
+      hotel: hotel,
+      rooms: rooms,
+    };
   }
 
   async update(
@@ -156,5 +174,4 @@ export class HotelsService {
     await this.hotelModel.findByIdAndDelete(id).exec();
     return "Deleted successfully";
   }
-
 }
