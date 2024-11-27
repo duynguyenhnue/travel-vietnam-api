@@ -1,19 +1,25 @@
 import { HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { CreateBookingRequest, SearchBookingRequestDto } from "src/payload/request/booking.request";
+import {
+  CreateBookingRequest,
+  SearchBookingRequestDto,
+} from "src/payload/request/booking.request";
 import { Booking, BookingDocument } from "src/schema/booking.schema";
 import { TourService } from "../tour/tour.service";
 import { UserService } from "../users/users.service";
 import { BookingStatus, BookingType } from "src/enums/booking.enum";
 import { Tour, TourDocument } from "src/schema/tour.schema";
 import { CommonException } from "src/common/exception/common.exception";
+import { User } from "src/schema/user.schema";
+import { Hotel } from "src/schema/hotel.schema";
 
 @Injectable()
 export class BookingService {
   constructor(
     @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
     @InjectModel(Tour.name) private tourModel: Model<TourDocument>,
+    @InjectModel(Hotel.name) private readonly hotelModel: Model<Hotel>,
 
     private readonly tourService: TourService,
     private readonly userService: UserService
@@ -76,7 +82,9 @@ export class BookingService {
     return booking;
   }
 
-  async getAllBookings(id: string): Promise<{ data: Booking[]; total: number }> {
+  async getAllBookings(
+    id: string
+  ): Promise<{ data: Booking[]; total: number }> {
     const total = await this.bookingModel.countDocuments({ userId: id }).exec();
     const bookings = await this.bookingModel.find({ userId: id }).exec();
     console.log(total);
@@ -92,15 +100,35 @@ export class BookingService {
   }
 
   async getBookingBySearch(
-    query: SearchBookingRequestDto
+    query: SearchBookingRequestDto,
+    user: User
   ): Promise<{ data: Booking[]; total: number }> {
-    console.log(query);
-
-    const { amount, bookingType, status, limit, page } = query;
-    const offset = page * limit;
     const filter: any = {
       isDeleted: false,
     };
+
+    const { amount, bookingType, status, limit, page } = query;
+    const offset = page * limit;
+
+    if (user.role !== "ADMIN" && user.role !== "USER") {
+      const hotels = await this.hotelModel.find({ userId: user._id }).exec();
+      const tours = await this.tourModel.find({ userId: user._id }).exec();
+
+      const bookings = await this.bookingModel
+        .find({
+          orderId: {
+            $in: [
+              ...hotels.map((hotel) => hotel._id.toString()),
+              ...tours.map((tour) => tour.id.toString()),
+            ],
+          },
+        })
+        .exec();
+
+      if (bookings.length > 0) {
+        filter._id = { $in: bookings.map((b) => b._id) };
+      }
+    }
 
     if (amount) {
       filter.amount = amount;

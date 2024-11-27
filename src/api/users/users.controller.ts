@@ -56,9 +56,11 @@ export class UserController {
 
   @Get("search")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.CUSTOMER_VIEW)
-  async search(@Query() query: SearchUserRequest) {
+  async search(@Query() query: SearchUserRequest, @Req() req) {
     try {
-      return successResponse(await this.userService.searchUsers(query));
+      return successResponse(
+        await this.userService.searchUsers(query, req.user)
+      );
     } catch (error) {
       throw new CommonException(
         error.message,
@@ -101,7 +103,14 @@ export class UserController {
   }
 
   @Post("change-password")
-  async changePassword(@Req() req, @Body() changePasswordRequest: ChangePasswordRequest) {    
-    return this.userService.changePassword(req.user._id, changePasswordRequest.oldPassword, changePasswordRequest.newPassword);
+  async changePassword(
+    @Req() req,
+    @Body() changePasswordRequest: ChangePasswordRequest
+  ) {
+    return this.userService.changePassword(
+      req.user._id,
+      changePasswordRequest.oldPassword,
+      changePasswordRequest.newPassword
+    );
   }
 }
