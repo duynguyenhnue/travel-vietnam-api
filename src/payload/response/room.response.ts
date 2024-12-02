@@ -17,9 +17,6 @@ export class RoomResponseDto {
   readonly bedType: string;
 
   @Expose()
-  readonly amenities: string[];
-
-  @Expose()
   readonly images: string[];
 
   @Expose()

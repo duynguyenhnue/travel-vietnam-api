@@ -20,9 +20,6 @@ export class Room extends Document {
   maxOccupancy: number;
 
   @Prop([String])
-  amenities: string[];
-
-  @Prop([String])
   images: string[];
 
   @Prop({ required: true })

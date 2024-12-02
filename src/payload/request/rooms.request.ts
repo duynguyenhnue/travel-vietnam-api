@@ -1,14 +1,9 @@
 import { PartialType } from "@nestjs/mapped-types";
 import {
   IsString,
-  IsNumber,
-  IsBoolean,
   IsArray,
   IsOptional,
   Matches,
-  IsInt,
-  Min,
-  Max,
   IsEnum,
 } from "class-validator";
 import { ObjectId, isValidObjectId } from "mongoose";
@@ -27,10 +22,6 @@ export class CreateRoomRequestDto {
 
   @IsString()
   readonly description: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  readonly amenities: string[];
 
   @IsString()
   @Matches(/^[0-9a-fA-F]{24}$/, {

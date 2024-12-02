@@ -79,6 +79,10 @@ export class RoleService {
       total,
     };
   }
+  async getAllRoles(): Promise<string[]> {
+    const roles = await this.roleRepository.getListRoles(0, 1000);
+    return roles.data.map((role) => role.name);
+  }
 
   async getListPermissionRole(role: string): Promise<string[]> {
     const res = await this.roleRepository.findByRoleName(role);
