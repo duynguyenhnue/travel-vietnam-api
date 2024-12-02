@@ -11,6 +11,9 @@ export class Hotel extends Document {
   name: string;
 
   @Prop({ required: true })
+  userId: string;
+
+  @Prop({ required: true })
   address: Address;
 
   @Prop({ required: true })

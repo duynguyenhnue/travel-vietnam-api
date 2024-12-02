@@ -11,7 +11,10 @@ import {
 import { BookingService } from "./booking.service";
 import { successResponse } from "src/common/dto/response.dto";
 import { CommonException } from "src/common/exception/common.exception";
-import { CreateBookingRequest, SearchBookingRequestDto } from "src/payload/request/booking.request";
+import {
+  CreateBookingRequest,
+  SearchBookingRequestDto,
+} from "src/payload/request/booking.request";
 import { ParseObjectIdPipe } from "src/config/parse-objectId-pipe";
 import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
 import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
@@ -78,11 +81,16 @@ export class BookingController {
     }
   }
 
-  @SkipAuth()
   @Get("search")
-  async getBookingBySearch(@Query() query: SearchBookingRequestDto) {
+  async getBookingBySearch(
+    @Query() query: SearchBookingRequestDto,
+    @Req() req
+  ) {
     try {
-      const bookings = await this.bookingService.getBookingBySearch(query);
+      const bookings = await this.bookingService.getBookingBySearch(
+        query,
+        req.user
+      );
       return successResponse(bookings);
     } catch (error) {
       throw new CommonException(

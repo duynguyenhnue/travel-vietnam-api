@@ -43,7 +43,11 @@ export class TourController {
     @Req() req
   ) {
     try {
-      const savedTour = await this.tourService.createTour(createTourDto, files);
+      const savedTour = await this.tourService.createTour(
+        createTourDto,
+        files,
+        req.user._id
+      );
       this.notificationService.logNotification({
         title: "New Tour Created",
         message: `New tour ${savedTour.title} has been created`,
@@ -120,12 +124,21 @@ export class TourController {
       );
     }
   }
-  
+
   @SkipAuth()
   @Get("search")
-  async getTourBySearch(@Query() query: SearchTourRequestDto) {
+  async getTourBySearch(@Query() query: SearchTourRequestDto, @Req() req) {
     try {
-      const tours = await this.tourService.getTourBySearch(query);
+      const authHeader = req.headers.authorization;
+      let user = null;
+      if (authHeader) {
+        const token = authHeader.split(" ")[1];
+
+        user = await this.tourService.validateToken(token);
+      }
+
+      const tours = await this.tourService.getTourBySearch(query, user);
+
       return successResponse(tours);
     } catch (error) {
       throw new CommonException(

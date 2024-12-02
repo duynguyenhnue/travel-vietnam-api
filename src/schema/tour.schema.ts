@@ -21,6 +21,9 @@ export class Tour {
   title: string;
 
   @Prop({ required: true })
+  userId: string;
+
+  @Prop({ required: true })
   photos: string[];
 
   @Prop({ required: true })

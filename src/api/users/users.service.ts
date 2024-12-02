@@ -14,11 +14,17 @@ import {
 } from "../../payload/request/users.request";
 import { UserResponse } from "src/payload/response/users.request";
 import { plainToInstance } from "class-transformer";
+import { Hotel } from "src/schema/hotel.schema";
+import { Tour } from "src/schema/tour.schema";
+import { Booking } from "src/schema/booking.schema";
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Hotel.name) private readonly hotelModel: Model<Hotel>,
+    @InjectModel(Tour.name) private readonly tourModel: Model<Tour>,
+    @InjectModel(Booking.name) private readonly bookingModel: Model<Booking>
   ) {}
 
   async onModuleInit() {
@@ -70,7 +76,7 @@ export class UserService {
   }
 
   async findUser(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).select('-password').exec(); 
+    const user = await this.userModel.findById(id).select("-password").exec();
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -78,11 +84,35 @@ export class UserService {
   }
 
   async searchUsers(
-    query: SearchUserRequest
+    query: SearchUserRequest,
+    user: User
   ): Promise<{ data: User[]; total: number }> {
     const { limit = 6, page = 0 } = query;
     const offset = page * limit;
     const filter: any = {};
+    let userIds = [];
+
+    if (user.role !== "ADMIN") {
+      const hotels = await this.hotelModel.find({ userId: user._id }).exec();
+      const tours = await this.tourModel.find({ userId: user._id }).exec();
+
+      const bookings = await this.bookingModel
+        .find({
+          orderId: {
+            $in: [
+              ...hotels.map((hotel) => hotel._id.toString()),
+              ...tours.map((tour) => tour.id.toString()),
+            ],
+          },
+        })
+        .exec();
+
+      userIds = bookings.map((b) => b.userId);
+    }
+
+    if (userIds.length > 0) {
+      filter._id = { $in: userIds };
+    }
 
     if (query.email) {
       filter.email = { $regex: query.email, $options: "i" };
@@ -108,7 +138,7 @@ export class UserService {
   }
 
   async findUserById(id: any): Promise<User> {
-    const user = await this.userModel.findById(id).select('-password').exec();
+    const user = await this.userModel.findById(id).select("-password").exec();
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -141,7 +171,11 @@ export class UserService {
     }
   }
 
-  async changePassword(id: string, oldPassword: string, newPassword: string): Promise<string> {
+  async changePassword(
+    id: string,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<string> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
