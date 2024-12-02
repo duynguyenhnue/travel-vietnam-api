@@ -1,10 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
+import { ReplyReviewRequest } from "src/payload/request/tour.request";
 
 export type ReviewDocument = Review & Document;
 
 @Schema({ timestamps: true })
 export class Review {
+  @Prop({ type: Types.ObjectId })
+  _id: Types.ObjectId;
+
   @Prop({ type: Types.ObjectId, ref: "tour", required: false })
   tourId?: Types.ObjectId;
 
@@ -31,6 +35,9 @@ export class Review {
 
   @Prop({ required: false })
   updatedAt?: Date;
+
+  @Prop({ type: [ReplyReviewRequest], required: false })
+  reply?: ReplyReviewRequest[];
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

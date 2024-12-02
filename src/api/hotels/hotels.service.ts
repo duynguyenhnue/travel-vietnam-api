@@ -93,8 +93,8 @@ export class HotelsService {
           hotel.reviews as unknown as string[]
         );
         return { ...hotel.toObject(), reviews };
-        })
-      );
+      })
+    );
 
     const total = await this.hotelModel.countDocuments(filter).exec();
 
@@ -115,6 +115,7 @@ export class HotelsService {
       reviews.map(async (review) => {
         const user = await this.userService.findUserById(review.userId);
         return {
+          _id: review._id,
           userId: review.userId,
           avatar: user.avatar,
           fullName: user.fullName,
@@ -153,7 +154,20 @@ export class HotelsService {
     const reviewsWithUserDetails = await Promise.all(
       reviews.map(async (review) => {
         const user = await this.userService.findUserById(review.userId);
+        if (review.reply) {
+          review.reply = await Promise.all(
+            review.reply.map(async (reply) => {
+              const user = await this.userService.findUserById(reply.userId);
+              return {
+                ...reply,
+                avatar: user.avatar,
+                fullName: user.fullName,
+              };
+            })
+          );
+        }
         return {
+          _id: review._id,
           userId: review.userId,
           avatar: user.avatar,
           fullName: user.fullName,
@@ -161,6 +175,7 @@ export class HotelsService {
           reviewText: review.reviewText,
           createdAt: review.createdAt,
           updatedAt: review.updatedAt,
+          reply: review.reply,
         };
       })
     );
