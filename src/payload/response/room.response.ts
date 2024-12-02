@@ -1,8 +1,11 @@
-import { Exclude, Expose } from "class-transformer";
+import { Expose } from "class-transformer";
 
 export class RoomResponseDto {
   @Expose()
   readonly id: string;
+
+  @Expose()
+  readonly hotelName?: string;
 
   @Expose()
   readonly roomNumber: string;
@@ -15,9 +18,6 @@ export class RoomResponseDto {
 
   @Expose()
   readonly bedType: string;
-
-  @Expose()
-  readonly images: string[];
 
   @Expose()
   readonly hotelId: string;

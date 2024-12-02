@@ -62,6 +62,19 @@ export class RoomsController {
     }
   }
 
+  @Get("get-one/:id")
+  @SkipAuth()
+  async findOne(@Param("id") id: string) {
+    try {
+      return successResponse(await this.roomsService.findOne(id));
+    } catch (error) {
+      throw new CommonException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Get(":hotelId/:roomId")
   @SkipAuth()
   async findRoomByHotelId(
@@ -87,6 +100,8 @@ export class RoomsController {
     @Body() updateRoomDto: UpdateRoomRequestDto
   ) {
     try {
+      console.log(id);
+      console.log(updateRoomDto);
       return successResponse(await this.roomsService.update(id, updateRoomDto));
     } catch (error) {
       throw new CommonException(

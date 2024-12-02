@@ -241,4 +241,12 @@ export class HotelsService {
     await this.hotelModel.findByIdAndDelete(id).exec();
     return "Deleted successfully";
   }
+
+  async getHotelByName(): Promise<{ id: string; name: string }[]> {
+    const hotels = await this.hotelModel.find({}).exec();
+    return hotels.map((hotel) => ({
+      id: hotel._id.toString(),
+      name: hotel.name,
+    }));
+  }
 }

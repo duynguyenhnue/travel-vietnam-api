@@ -19,9 +19,6 @@ export class Room extends Document {
   @Prop({ required: true })
   maxOccupancy: number;
 
-  @Prop([String])
-  images: string[];
-
   @Prop({ required: true })
   hotelId: string;
 
