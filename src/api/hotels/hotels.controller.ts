@@ -11,14 +11,12 @@ import {
   HttpStatus,
   Query,
   Req,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { HotelsService } from "./hotels.service";
 import {
   CreateHotelRequestDto,
   SearchHotelsRequestDto,
   UpdateHotelRequestDto,
-  searchHotelIdRequestDto,
 } from "src/payload/request/hotels.request";
 import { SkipAuth } from "src/config/skip.auth";
 import { CommonException } from "src/common/exception/common.exception";
@@ -27,7 +25,6 @@ import { ObjectId } from "mongoose";
 import { successResponse } from "src/common/dto/response.dto";
 import { AuthJwtAccessProtected } from "src/common/guards/role.guard";
 import { AUTH_PERMISSIONS } from "src/enums/auth.enum";
-import { JwtService } from "@nestjs/jwt";
 
 @Controller("hotels")
 export class HotelsController {
@@ -51,6 +48,14 @@ export class HotelsController {
         error.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Get("/name")
+  @SkipAuth()
+  async searchHotelName() {
+    return successResponse(
+      await this.hotelsService.getHotelByName()
+    );
   }
 
   @Get("/search")

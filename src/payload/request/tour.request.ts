@@ -32,6 +32,17 @@ class Address {
   ward: string;
 }
 
+export class ReplyReviewRequest {
+  @IsString()
+  @IsNotEmpty()
+  reviewText: string; 
+
+  @IsString()
+  @IsOptional()
+  userId?: string;
+}
+
+
 export class CreateTourDto {
   @IsString()
   @IsNotEmpty()
@@ -130,4 +141,9 @@ export class CreateReviewRequest {
   @IsString()
   @IsOptional()
   tourId?: string;
+
+  @ValidateNested()
+  @Type(() => ReplyReviewRequest)
+  @IsOptional()
+  reply?: ReplyReviewRequest;
 }

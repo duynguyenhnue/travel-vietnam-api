@@ -62,11 +62,13 @@ export class RoomsService {
   async searchRoomsByHotel(
     query: SearchRoomRequestDto
   ): Promise<{ data: RoomResponseDto[]; total: number }> {
-    const { limit = 6, page = 0, price, maxOccupancy, roomType } = query;
+    const { limit = 6, page = 0, price, roomNumber, roomType } = query;
     const offset = page * limit;
 
     const filter: any = {};
-    filter.hotelId = query.hotelId;
+    if (query.hotelId) {
+      filter.hotelId = query.hotelId;
+    }
 
     if (roomType) {
       filter.roomType = roomType;
@@ -76,8 +78,8 @@ export class RoomsService {
       filter.price = { $lte: price };
     }
 
-    if (maxOccupancy) {
-      filter.maxOccupancy = maxOccupancy;
+    if (roomNumber && !isNaN(Number(roomNumber)) && roomNumber != 0) {
+      filter.roomNumber = { $lte: parseInt(roomNumber.toString(), 10) };
     }
 
     const data = await this.roomModel
@@ -87,12 +89,26 @@ export class RoomsService {
       .limit(limit)
       .exec();
 
+
+    const newData = await Promise.all(
+      data.map(async (room) => {
+        if (room.hotelId) {
+          const hotel = await this.hotelsService.findOne(
+            room.hotelId as unknown as ObjectId
+          );
+          return {
+            ...room.toObject(),
+            hotelName: hotel.hotel.name
+          } as RoomResponseDto;
+        }
+        return room as unknown as RoomResponseDto;
+      })
+    );
+
     const total = await this.roomModel.countDocuments(filter).exec();
 
     return {
-      data: data.map((hotel) =>
-        plainToInstance(RoomResponseDto, hotel.toObject())
-      ),
+      data: newData,
       total,
     };
   }
@@ -127,5 +143,16 @@ export class RoomsService {
 
   async delete(id: string): Promise<void> {
     await this.roomModel.findByIdAndDelete(id).exec();
+  }
+
+  async findOne(id: string): Promise<RoomResponseDto> {
+    const room = await this.roomModel.findById(id).exec();
+    if (room?.hotelId) {
+      const hotel = await this.hotelsService.findOne(
+        room.hotelId as unknown as ObjectId
+      );
+      return { ...room.toObject(), hotelName: hotel.hotel.name } as RoomResponseDto;
+    }
+    return plainToInstance(RoomResponseDto, room.toObject());
   }
 }

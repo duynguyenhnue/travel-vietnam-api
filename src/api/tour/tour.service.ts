@@ -126,6 +126,7 @@ export class TourService {
       reviews.map(async (review) => {
         const user = await this.userService.findUserById(review.userId);
         return {
+          _id: review._id,
           userId: review.userId,
           avatar: user.avatar,
           fullName: user.fullName,

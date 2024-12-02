@@ -64,7 +64,7 @@ export class searchHotelIdRequestDto {
   search?: string;
 
   @Type(() => Number)
-  @Min(6)
+  @Min(5)
   limit: number;
 
   @Type(() => Number)

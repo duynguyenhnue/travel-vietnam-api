@@ -1,15 +1,11 @@
 import { PartialType } from "@nestjs/mapped-types";
 import {
   IsString,
-  IsNumber,
-  IsBoolean,
   IsArray,
   IsOptional,
   Matches,
-  IsInt,
-  Min,
-  Max,
   IsEnum,
+  IsNumber,
 } from "class-validator";
 import { ObjectId, isValidObjectId } from "mongoose";
 import { RoomType } from "src/enums/room.enum";
@@ -21,16 +17,11 @@ export class CreateRoomRequestDto {
   @IsString()
   readonly roomNumber: string;
 
-  @IsString()
-  @Matches(/^\d+$/, { message: "Price must be a numeric string." })
+  @IsNumber()
   readonly price: number;
 
   @IsString()
   readonly description: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  readonly amenities: string[];
 
   @IsString()
   @Matches(/^[0-9a-fA-F]{24}$/, {
@@ -41,22 +32,17 @@ export class CreateRoomRequestDto {
   @IsEnum(RoomType)
   readonly roomType: RoomType;
 
-  @IsString()
-  @Matches(/^[1-4]$/, {
-    message:
-      "Occupancy must be a string containing an integer between 1 and 4.",
-  })
+  @IsNumber()
   readonly maxOccupancy: number;
 }
 
 export class UpdateRoomRequestDto extends PartialType(CreateRoomRequestDto) {
-  @IsArray()
-  @IsString({ each: true })
-  readonly images?: string[];
+ 
 }
 
 export class SearchRoomRequestDto extends searchHotelIdRequestDto {
   @IsString()
+  @IsOptional()
   @Type(() => ParseObjectIdPipe)
   hotelId: ObjectId;
 
@@ -64,13 +50,10 @@ export class SearchRoomRequestDto extends searchHotelIdRequestDto {
   @IsOptional()
   roomType: RoomType;
 
-  @IsString()
-  @Matches(/^[1-6]$/, {
-    message:
-      "Occupancy must be a string containing an integer between 1 and 6.",
-  })
   @IsOptional()
-  maxOccupancy: number;
+  @IsString()
+  @Matches(/^\d+$/, { message: "Room number must be a numeric string." })
+  roomNumber: number;
 
   @IsOptional()
   @IsString()

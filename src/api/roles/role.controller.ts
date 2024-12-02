@@ -54,6 +54,20 @@ export class RoleController {
     }
   }
 
+  @Get("get-all")
+  @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROLE_VIEW)
+  async getAllRoles() {
+    try {
+      const roles = await this.service.getAllRoles();
+      return successResponse(roles);
+    } catch (error) {
+      throw new CommonException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   @Get("get/:roleId")
   @AuthJwtAccessProtected(AUTH_PERMISSIONS.ROLE_VIEW)
   async getRoleDetail(@Param("roleId") roleId: string) {
