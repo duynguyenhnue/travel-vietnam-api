@@ -106,11 +106,7 @@ export class UserService {
           },
         })
         .exec();
-
       userIds = bookings.map((b) => b.userId);
-    }
-
-    if (userIds.length > 0) {
       filter._id = { $in: userIds };
     }
 
