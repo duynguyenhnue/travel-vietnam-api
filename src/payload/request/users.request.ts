@@ -88,6 +88,10 @@ export class UpdateUserRequest {
   @IsString()
   @IsOptional()
   status?: string;
+
+  @IsString()
+  @IsOptional()
+  role?: string;
 }
 
 export class SearchUserRequest {
