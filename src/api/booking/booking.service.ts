@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, ObjectId } from "mongoose";
 import {
   CreateBookingRequest,
   SearchBookingRequestDto,
@@ -62,6 +62,21 @@ export class BookingService {
     if (!booking) {
       throw new NotFoundException("Booking not found");
     }
+    return booking;
+  }
+
+  async getBookingRoomByDate(
+    startDate: string,
+    endDate: string,
+    hotelId: ObjectId
+  ): Promise<Booking[]> {
+    const filter = {
+      orderId: hotelId,
+      startDate: { $lte: endDate },
+      endDate: { $gte: startDate },
+    };
+    const booking = await this.bookingModel.find(filter).exec();
+
     return booking;
   }
 

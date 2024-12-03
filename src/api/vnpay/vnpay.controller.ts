@@ -66,7 +66,7 @@ export class VnpayController {
           query.vnp_TxnRef,
           BookingStatus.CONFIRMED
         );
-        const room = await this.vnpayService.roomStatus(booking.roomId);
+        // const room = await this.vnpayService.roomStatus(booking.roomId);
 
         return successResponse({
           status: BookingStatus.CONFIRMED,

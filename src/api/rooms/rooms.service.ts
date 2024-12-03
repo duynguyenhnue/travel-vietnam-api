@@ -6,6 +6,7 @@ import { Room } from "src/schema/room.schema";
 import {
   CreateRoomRequestDto,
   SearchRoomRequestDto,
+  SearchRoomsRequestDto,
   UpdateRoomRequestDto,
 } from "src/payload/request/rooms.request";
 import { RoomResponseDto } from "src/payload/response/room.response";
@@ -13,13 +14,15 @@ import { FirebaseService } from "../firebase/firebase.service";
 import { Folder } from "src/enums/folder.enum";
 import { HotelsService } from "../hotels/hotels.service";
 import { CommonException } from "src/common/exception/common.exception";
+import { BookingService } from "../booking/booking.service";
 
 @Injectable()
 export class RoomsService {
   constructor(
     @InjectModel(Room.name) private roomModel: Model<Room>,
     private readonly firebaseService: FirebaseService,
-    private readonly hotelsService: HotelsService
+    private readonly hotelsService: HotelsService,
+    private readonly bookingService: BookingService
   ) {}
 
   async roomStatus(roomId: ObjectId, status: boolean) {
@@ -62,7 +65,7 @@ export class RoomsService {
   async searchRoomsByHotel(
     query: SearchRoomRequestDto
   ): Promise<{ data: RoomResponseDto[]; total: number }> {
-    const { limit = 6, page = 0, price, roomNumber, roomType } = query;
+    const { limit = 6, page = 0, price, roomType } = query;
     const offset = page * limit;
 
     const filter: any = {};
@@ -78,17 +81,12 @@ export class RoomsService {
       filter.price = { $lte: price };
     }
 
-    if (roomNumber && !isNaN(Number(roomNumber)) && roomNumber != 0) {
-      filter.roomNumber = { $lte: parseInt(roomNumber.toString(), 10) };
-    }
-
     const data = await this.roomModel
       .find(filter)
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
       .exec();
-
 
     const newData = await Promise.all(
       data.map(async (room) => {
@@ -98,7 +96,7 @@ export class RoomsService {
           );
           return {
             ...room.toObject(),
-            hotelName: hotel.hotel.name
+            hotelName: hotel.hotel.name,
           } as RoomResponseDto;
         }
         return room as unknown as RoomResponseDto;
@@ -111,6 +109,45 @@ export class RoomsService {
       data: newData,
       total,
     };
+  }
+
+  async searchRooms(query: SearchRoomsRequestDto): Promise<Room[]> {
+    const { price, roomType, startDate, endDate, hotelId } = query;
+
+    const filter: any = {};
+    if (hotelId) {
+      filter.hotelId = hotelId;
+    }
+
+    if (roomType) {
+      filter.roomType = roomType;
+    }
+
+    if (price) {
+      filter.price = { $lte: price };
+    }
+
+    const roombooked = await this.bookingService.getBookingRoomByDate(
+      startDate,
+      endDate,
+      hotelId
+    );
+
+    const data = await this.roomModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .exec();
+
+    const newData = data.map((room) => {
+      if (roombooked.flatMap((e) => e.roomId).includes(room._id.toString())) {
+        room.roomNumber =
+          room.roomNumber -
+          roombooked.filter((e) => e.roomId === room._id.toString()).length;
+      }
+      return room;
+    });
+
+    return newData;
   }
 
   async findRoomByHotelId(
@@ -151,7 +188,10 @@ export class RoomsService {
       const hotel = await this.hotelsService.findOne(
         room.hotelId as unknown as ObjectId
       );
-      return { ...room.toObject(), hotelName: hotel.hotel.name } as RoomResponseDto;
+      return {
+        ...room.toObject(),
+        hotelName: hotel.hotel.name,
+      } as RoomResponseDto;
     }
     return plainToInstance(RoomResponseDto, room.toObject());
   }

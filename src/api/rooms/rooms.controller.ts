@@ -15,6 +15,7 @@ import { RoomsService } from "./rooms.service";
 import {
   CreateRoomRequestDto,
   SearchRoomRequestDto,
+  SearchRoomsRequestDto,
   UpdateRoomRequestDto,
 } from "src/payload/request/rooms.request";
 import { FilesInterceptor } from "@nestjs/platform-express";
@@ -51,9 +52,9 @@ export class RoomsController {
 
   @Get()
   @SkipAuth()
-  async searchRoomsByHotel(@Query() query: SearchRoomRequestDto) {
+  async searchRoomsByHotel(@Query() query: SearchRoomsRequestDto) {
     try {
-      return successResponse(await this.roomsService.searchRoomsByHotel(query));
+      return successResponse(await this.roomsService.searchRooms(query));
     } catch (error) {
       throw new CommonException(
         error.message,
