@@ -5,7 +5,7 @@ import { RoomType } from "src/enums/room.enum";
 @Schema({ timestamps: true })
 export class Room extends Document {
   @Prop({ required: true })
-  roomNumber: string;
+  roomNumber: number;
 
   @Prop({ required: true })
   price: number;

@@ -127,9 +127,7 @@ export class HotelsService {
       throw new NotFoundException("Hotel not found");
     }
 
-    const reviews = await this.getReviews(
-      hotel.reviews as unknown as string[]
-    );
+    const reviews = await this.getReviews(hotel.reviews as unknown as string[]);
 
     const reviewsWithUserDetails = await Promise.all(
       reviews.map(async (review) => {
@@ -150,9 +148,7 @@ export class HotelsService {
   }
 
   async getReviews(id: string[]): Promise<Review[]> {
-    const reviews = await this.reviewModel
-      .find({ _id: { $in: id } })
-      .exec();
+    const reviews = await this.reviewModel.find({ _id: { $in: id } }).exec();
 
     if (!reviews) {
       throw new NotFoundException("Review not found");
@@ -161,15 +157,15 @@ export class HotelsService {
     return reviews;
   }
 
-  async findOne(id: ObjectId): Promise<{ hotel: HotelResponseDto; rooms: Room[] }> {
+  async findOne(
+    id: ObjectId
+  ): Promise<{ hotel: HotelResponseDto; rooms: Room[] }> {
     const hotel = await this.hotelModel.findById(id).populate("reviews").exec();
     if (!hotel) {
       throw new NotFoundException("Hotel not found");
     }
 
-    const reviews = await this.getReviews(
-      hotel.reviews as unknown as string[]
-    );
+    const reviews = await this.getReviews(hotel.reviews as unknown as string[]);
 
     const reviewsWithUserDetails = await Promise.all(
       reviews.map(async (review) => {
@@ -199,11 +195,9 @@ export class HotelsService {
         };
       })
     );
-    const hotelNew = { ...hotel.toObject(), reviews: reviewsWithUserDetails }
+    const hotelNew = { ...hotel.toObject(), reviews: reviewsWithUserDetails };
 
-    const rooms = await this.roomModel
-      .find({ hotelId: id, status: false })
-      .exec();
+    const rooms = await this.roomModel.find({ hotelId: id }).exec();
 
     return {
       hotel: hotelNew,

@@ -36,9 +36,7 @@ export class CreateRoomRequestDto {
   readonly maxOccupancy: number;
 }
 
-export class UpdateRoomRequestDto extends PartialType(CreateRoomRequestDto) {
- 
-}
+export class UpdateRoomRequestDto extends PartialType(CreateRoomRequestDto) {}
 
 export class SearchRoomRequestDto extends searchHotelIdRequestDto {
   @IsString()
@@ -52,11 +50,38 @@ export class SearchRoomRequestDto extends searchHotelIdRequestDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^\d+$/, { message: "Room number must be a numeric string." })
-  roomNumber: number;
+  @Matches(/^\d+$/, { message: "Price must be a numeric string." })
+  price: number;
+
+  @IsOptional()
+  @IsString()
+  startDate: string;
+
+  @IsOptional()
+  @IsString()
+  endDate: string;
+}
+
+export class SearchRoomsRequestDto {
+  @IsString()
+  @IsOptional()
+  @Type(() => ParseObjectIdPipe)
+  hotelId: ObjectId;
+
+  @IsEnum(RoomType)
+  @IsOptional()
+  roomType: RoomType;
 
   @IsOptional()
   @IsString()
   @Matches(/^\d+$/, { message: "Price must be a numeric string." })
   price: number;
+
+  @IsOptional()
+  @IsString()
+  startDate: string;
+
+  @IsOptional()
+  @IsString()
+  endDate: string;
 }
