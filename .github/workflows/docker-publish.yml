@@ -101,10 +101,10 @@ jobs:
             -e PASSWORD_MAIL=Chugg203 \
             -e VNPAY_TMN_CODE=V65MNMN3 \
             -e DOMAIN_ADMIN=http://20.2.90.206:8080 \
-            -e DOMAIN_CLIENT=http://20.2.90.206:8080 \
+            -e DOMAIN_CLIENT=https://travelvietnam.vercel.app \
             -e VNPAY_HASH_SECRET=32CFKSOQ7R4EISE9944JRCAHPDCXXA7J \
             -e VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html \
-            -e VNPAY_RETURN_URL=http://20.2.90.206:8080/vnpay/vnpay_return \
+            -e VNPAY_RETURN_URL=https://travelvietnam.vercel.app/vnpay/vnpay_return \
             -e FIREBASE_TYPE=service_account \
             -e FIREBASE_PROJECT_ID=travel-vietnam-2cca2 \
             -e FIREBASE_PRIVATE_KEY_ID=efa22646da1b2b1de6259c88fca7868f0baf2ed9 \
