@@ -86,8 +86,8 @@ jobs:
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
           # Stop and remove the old container if it exists
-          docker stop travel_backend_container || true
-          docker rm travel_backend_container || true
+          docker stop _backend_container || true
+          docker rm _backend_container || true
 
           # Chạy container mới, bind port 8000
           docker run -d --restart unless-stopped \
@@ -95,16 +95,16 @@ jobs:
             -e JWT_SECRET="travel-vietnam" \
             -e JWT_REFRESH_SECRET="travel-vietnam-refresh" \
             -e DATABASE_MONGO_SRC="mongodb+srv://stu715105064:ZeClf5THTVJyp5Jr@cluster0.yyq3k.mongodb.net/travel-social" \
-            -e WEBSOCKET_URL="https://socket.travel-vietnamese.me" \
+            -e WEBSOCKET_URL="http://20.2.90.206:8080" \
             -e PORT=8080 \
             -e ACCOUNT_MAIL="stu715105031@hnue.edu.vn" \
             -e PASSWORD_MAIL=Chugg203 \
             -e VNPAY_TMN_CODE=V65MNMN3 \
-            -e DOMAIN_ADMIN=https://admin.travel-vietnamese.me \
-            -e DOMAIN_CLIENT=https://travel-vietnamese.me \
+            -e DOMAIN_ADMIN=http://20.2.90.206:8080 \
+            -e DOMAIN_CLIENT=http://20.2.90.206:8080 \
             -e VNPAY_HASH_SECRET=32CFKSOQ7R4EISE9944JRCAHPDCXXA7J \
             -e VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html \
-            -e VNPAY_RETURN_URL=https://travel-vietnamese.me/vnpay/vnpay_return \
+            -e VNPAY_RETURN_URL=http://20.2.90.206:8080/vnpay/vnpay_return \
             -e FIREBASE_TYPE=service_account \
             -e FIREBASE_PROJECT_ID=travel-vietnam-2cca2 \
             -e FIREBASE_PRIVATE_KEY_ID=efa22646da1b2b1de6259c88fca7868f0baf2ed9 \
